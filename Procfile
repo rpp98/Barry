@@ -1,1 +1,1 @@
-worker: python barry_working.py
+worker: python Barry_working.py
