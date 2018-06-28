@@ -1,1 +1,1 @@
-worker: python barry-for-shroomdaddy-by-rpp.py
+worker: python barry_working.py
