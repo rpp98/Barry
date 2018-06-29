@@ -500,7 +500,6 @@ def full_results_to_str(full_results):
         #organizes into groups of 13
         if (idx + 1) % 20 == 0 or idx == (len(full_results) - 1):
             temp_list.append(result_message)
-            print(len(temp_list[0]))
             full_results_str_list.append(temp_list)
             temp_list = []
             result_message = ''
@@ -525,10 +524,9 @@ def current_div_results_to_str(current_div_results):
         #organizes into groups of 7 to not exceed Character Limit 1024
         if (idx + 1) % 15 == 0 or idx == (len(current_div_results) - 1):
             temp_list.append(result_message)
-            print(len(temp_list[0]))
             cdr_str_list.append(temp_list)
             temp_list = []
             result_message = ''
     return cdr_str_list
 
-bot.run(os.getenv('NDU3Nzc0NTU4MTcxMjM0MzA0.DgeAkw.tzs04tsHyxL1OI1GhVi6vVZhRkk'))
+bot.run('NDU3Nzc0NTU4MTcxMjM0MzA0.DgeAkw.tzs04tsHyxL1OI1GhVi6vVZhRkk')
