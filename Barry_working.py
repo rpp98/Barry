@@ -80,7 +80,7 @@ async def currentdiv(ctx,time_frame:str):
         results_dict = bot.results_dict
         results_desired_fr,results_desired_cd = results_dict[tf_to_period[time_frame]]
         #Format results into lists of strings for embedding and avoiding max length for messages in discord and embeds and based on value of 'score'
-        cd_results_sorted = sort_based_on_score(results_desired_cd
+        cd_results_sorted = sort_based_on_score(results_desired_cd)
         cdr_str_list = current_div_results_to_str(cd_results_sorted)
         #Reorganize results based on score value
        
