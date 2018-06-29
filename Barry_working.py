@@ -94,9 +94,10 @@ async def get_candles(coin,limitK,period):
     limitK = str(limitK)
     ENDPOINT = 'https://api.binance.com/api/v1/klines'
     url = ENDPOINT + '?symbol=' + coin + '&interval=' + period + '&limit=' + limitK
-    async with aiohttp.get(url) as resp:
-        if resp.status == 200:
-            coin_data = await resp.json()
+    async with aiohttp.Clientsession(loop=loop) as session:
+        async with session.get(url) as resp:
+            if resp.status == 200:
+                coin_data = await resp.json()
     return [{
         "open": d[1],
         "close": d[4],
