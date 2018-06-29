@@ -584,6 +584,7 @@ def reformat_overflow_str(price):
         elif overflow == 1:
             price = '{:.7f}'.format(price)
     else:
+        price = float(price)
         price = '{:.8f}'.format(price)
     return price
 
