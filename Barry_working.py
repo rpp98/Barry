@@ -443,8 +443,8 @@ def current_div_results_compiler(coin,current_div_RSI,void_price,list_price,curr
         current_div_results;list of dictionaries
     """
     if current_div_RSI[0] == True:
-        void_price = '{:.8f}'.format(void_price)
-        current_price = '{:.8f}'.format(list_price[-1])
+        void_price = reformat_overflow_str(void_price)
+        current_price = reformat_overflow_str(list_price[-1])
         current_div_results.append({'coin':coin,'score':current_div_RSI[1],'void price':void_price,'current price':current_price})
     return current_div_results
 
@@ -564,5 +564,27 @@ def sort_based_on_score(results):
                 sorted_results.append(results[idx])
     sorted_results.reverse()
     return sorted_results
-    
+
+def reformat_overflow_str(price):
+    '''Reformat prices for dictionary entries in the case they exceed len(str(price)) = 10 to reduce line bleed in result printing
+    Parameters:
+        price;float
+    Returns:
+        price;float
+    '''
+    if len(str(price)) > 10:
+        overflow = len(str(price)) - 10
+        price = float(price)
+        if overflow == 4:
+            price = '{:.4f}'.format(price)
+        elif overflow == 3:
+            price = '{:.5f}'.format(price)
+        elif overflow == 2:
+            price = '{:.6f}'.format(price)
+        elif overflow == 1:
+            price = '{:.7f}'.format(price)
+    else:
+        price = '{:.8f}'.format(price)
+    return price
+
 bot.run('NDU3Nzc0NTU4MTcxMjM0MzA0.DgeAkw.tzs04tsHyxL1OI1GhVi6vVZhRkk')
