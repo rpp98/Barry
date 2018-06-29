@@ -531,4 +531,4 @@ def current_div_results_to_str(current_div_results):
             result_message = ''
     return cdr_str_list
 
-bot.run('NDU3Nzc0NTU4MTcxMjM0MzA0.DgeAkw.tzs04tsHyxL1OI1GhVi6vVZhRkk')
+bot.run(os.getenv('NDU3Nzc0NTU4MTcxMjM0MzA0.DgeAkw.tzs04tsHyxL1OI1GhVi6vVZhRkk'))
