@@ -443,8 +443,10 @@ def current_div_results_compiler(coin,current_div_RSI,void_price,list_price,curr
         current_div_results;list of dictionaries
     """
     if current_div_RSI[0] == True:
+        void_price = '{:.8f}'.format(void_price)
+        current_price = '{:.8f}'.format(list_price[-1])
         void_price = reformat_overflow_str(void_price)
-        current_price = reformat_overflow_str(list_price[-1])
+        current_price = reformat_overflow_str(current_price)
         current_div_results.append({'coin':coin,'score':current_div_RSI[1],'void price':void_price,'current price':current_price})
     return current_div_results
 
@@ -583,9 +585,6 @@ def reformat_overflow_str(price):
             price = '{:.6f}'.format(price)
         elif overflow == 1:
             price = '{:.7f}'.format(price)
-    else:
-        price = float(price)
-        price = '{:.8f}'.format(price)
     return price
 
 bot.run('NDU3Nzc0NTU4MTcxMjM0MzA0.DgeAkw.tzs04tsHyxL1OI1GhVi6vVZhRkk')
