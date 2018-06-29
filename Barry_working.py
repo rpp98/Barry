@@ -562,6 +562,7 @@ def sort_based_on_score(results):
         for idx in range(len(slist_score)):
             if ascore == results[idx]['score']:
                 sorted_results.append(results[idx])
+    sorted_results.reverse()
     return sorted_results
     
 bot.run('NDU3Nzc0NTU4MTcxMjM0MzA0.DgeAkw.tzs04tsHyxL1OI1GhVi6vVZhRkk')
