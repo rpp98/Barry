@@ -514,7 +514,7 @@ def full_results_to_str(full_results):
     result_message = ''
     for idx in range(len(full_results)):
         dct = full_results[idx]
-        result = '**{}** | {} | Score: {} | Divergence from {} to {} periods ago'.format(dct['coin'],dct['type div'],dct['score'],dct['position'][1],dct['position'][0])
+        result = '**{}** | {} | Score: {} | Divergence from {} to {} periods ago\n'.format(dct['coin'],dct['type div'],dct['score'],dct['position'][1],dct['position'][0])
         result_message = result_message + result
         #organizes into groups of 13
         if (idx + 1) % 20 == 0 or idx == (len(full_results) - 1):
@@ -537,7 +537,7 @@ def current_div_results_to_str(current_div_results):
     #Formats result and adds to a temp_list which is used to not exceed char limit
     for idx in range(len(current_div_results)):
         dct = current_div_results[idx]
-        result = '**{}** | Score: {} | Void Price: {} | Current Price: {}'.format(dct['coin'],dct['score'],dct['void price'],dct['current price'])
+        result = '**{}** | Score: {} | Void Price: {} | Current Price: {}\n'.format(dct['coin'],dct['score'],dct['void price'],dct['current price'])
         result_message = result_message + result
         #organizes into groups of 7 to not exceed Character Limit 1024
         if (idx + 1) % 15 == 0 or idx == (len(current_div_results) - 1):
