@@ -47,7 +47,7 @@ async def background_running_analysis():
 
 #Bot command for analysis results
 @bot.command(pass_context=True)
-async def analyze(ctx,time_frame:str):
+async def histdiv(ctx,time_frame:str):
     valid_time_frames = ['1hour','2hour','4hour','6hour','8hour','12hour','1day']
     if time_frame not in valid_time_frames:
         await bot.say('Not a valid timeframe to analyze for')
@@ -57,9 +57,9 @@ async def analyze(ctx,time_frame:str):
         tf_to_period = {'1hour':'1h','2hour':'2h','4hour':'4h','6hour':'6h','8hour':'8h','12hour':'12h','1day':'1d'}
         results_dict = bot.results_dict
         results_desired_fr,results_desired_cd = results_dict[tf_to_period[time_frame]]
-        #Format results into lists of strings for embedding and avoiding max length for messages in discord and embeds
-        full_results_str_list = full_results_to_str(results_desired_fr)
-        cdr_str_list = current_div_results_to_str(results_desired_cd)
+        #Format results into lists of strings for embedding and avoiding max length for messages in discord and embeds and based on value of 'score'
+        full_results_sorted = sort_based_on_score(results_desired_fr)
+        full_results_str_list = full_results_to_str(full_results_sorted)
         tf_converter_print = {'1hour':'1 hour','2hour':'2 hour','4hour':'4 hour','6hour':'6 hour','8hour':'8 hour','12hour':'12 hour','1day':'1 day'}
         #Print embed statements to Discord
         for idx in range(len(full_results_str_list)):
@@ -67,6 +67,25 @@ async def analyze(ctx,time_frame:str):
             message = full_results_str_list[idx][0]
             embed = discord.Embed(title=embed_title,description=message)
             await bot.say(embed=embed)
+
+@bot.command(pass_context=True)
+async def currentdiv(ctx,time_frame:str):
+    valid_time_frames = ['1hour','2hour','4hour','6hour','8hour','12hour','1day']
+    if time_frame not in valid_time_frames:
+        await bot.say('Not a valid timeframe to analyze for')
+        await bot.say('Valid Time Frames are: {}'.format(valid_time_frames))
+    else:
+        #Retrieve results from background task
+        tf_to_period = {'1hour':'1h','2hour':'2h','4hour':'4h','6hour':'6h','8hour':'8h','12hour':'12h','1day':'1d'}
+        results_dict = bot.results_dict
+        results_desired_fr,results_desired_cd = results_dict[tf_to_period[time_frame]]
+        #Format results into lists of strings for embedding and avoiding max length for messages in discord and embeds and based on value of 'score'
+        cd_results_sorted = sort_based_on_score(results_desired_cd
+        cdr_str_list = current_div_results_to_str(cd_results_sorted)
+        #Reorganize results based on score value
+       
+        tf_converter_print = {'1hour':'1 hour','2hour':'2 hour','4hour':'4 hour','6hour':'6 hour','8hour':'8 hour','12hour':'12 hour','1day':'1 day'}
+        #Print embed statements to Discord
         for idx in range(len(cdr_str_list)):
             embed_title = 'Current Possible RSI Divergences (Part {} of {})'.format(idx + 1,len(cdr_str_list))
             message = cdr_str_list[idx][0]
@@ -74,11 +93,11 @@ async def analyze(ctx,time_frame:str):
             await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
-async def instructions(ctx):
+async def helpme(ctx):
     embed = discord.Embed(title='Help Guide',description='A quick overview of the bot')
     embed.set_author(name='RSI and OBV Divergence Indicator')
     embed.add_field(name='Valid Time Frames (written how is):',value='1hour, 2hour, 4hour, 6hour, 8hour, 12hour, 1day')
-    embed.add_field(name='Commands:',value='$instructions, $analyze (time frame)')
+    embed.add_field(name='Commands:',value='$helpme,$histdiv (time frame),$currentdiv (time frame)')
     embed.add_field(name='Calculates/Finds?',value='RSI and OBV Divergences (within 28 periods) and possible forming RSI Divergences')
     await bot.say(embed=embed)
 
@@ -94,7 +113,7 @@ async def get_candles(coin,limitK,period):
     limitK = str(limitK)
     ENDPOINT = 'https://api.binance.com/api/v1/klines'
     url = ENDPOINT + '?symbol=' + coin + '&interval=' + period + '&limit=' + limitK
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession() as session
         async with session.get(url) as resp:
             if resp.status == 200:
                 coin_data = await resp.json()
@@ -495,8 +514,7 @@ def full_results_to_str(full_results):
     result_message = ''
     for idx in range(len(full_results)):
         dct = full_results[idx]
-        #result = '{} has an {} with a score of {}. {} occurred {} periods ago with original divergence point {} periods ago \n'.format(dct['coin'],dct['type div'],dct['score'],dct['type div'],dct['position'][1],dct['position'][0])
-        result = '{} = {}. Score = {}. Divergence from {} to {} periods ago \n'.format(dct['coin'],dct['type div'],dct['score'],dct['position'][1],dct['position'][0])
+        result = '**{}** | {} | Score: {} | Divergence from {} to {} periods ago'.format(dct['coin'],dct['type div'],dct['score'],dct['position'][1],dct['position'][0])
         result_message = result_message + result
         #organizes into groups of 13
         if (idx + 1) % 20 == 0 or idx == (len(full_results) - 1):
@@ -519,8 +537,7 @@ def current_div_results_to_str(current_div_results):
     #Formats result and adds to a temp_list which is used to not exceed char limit
     for idx in range(len(current_div_results)):
         dct = current_div_results[idx]
-        #result = '{} has a currently bullishly diverging RSI with a score of {} and void price at {}. Its current price is {} \n'.format(dct['coin'],dct['score'],dct['void price'],dct['current price'])
-        result = '{} = Currently Diverging RSI. Score = {}. Void Price = {}. Current Price = {} \n'.format(dct['coin'],dct['score'],dct['void price'],dct['current price'])
+        result = '**{}** | Score: {} | Void Price: {} | Current Price: {}'.format(dct['coin'],dct['score'],dct['void price'],dct['current price'])
         result_message = result_message + result
         #organizes into groups of 7 to not exceed Character Limit 1024
         if (idx + 1) % 15 == 0 or idx == (len(current_div_results) - 1):
@@ -530,4 +547,21 @@ def current_div_results_to_str(current_div_results):
             result_message = ''
     return cdr_str_list
 
+def sort_based_on_score(results):
+    '''Sorts results based on their score back into a list
+    Parameters:
+        results;list of dictionaries
+    Returns:
+        sorted_results;list of dictionaries
+    '''
+    slist_score = [x['score'] for x in results]  
+    slist_tuple = [(x,results[x]['score']) for x in range(len(results))]
+    slist_score.sort()
+    sorted_results = []
+    for ascore in slist_score:
+        for idx in range(len(slist_score)):
+            if ascore == results[idx]['score']:
+                sorted_results.append(results[idx])
+    return sorted_results
+    
 bot.run('NDU3Nzc0NTU4MTcxMjM0MzA0.DgeAkw.tzs04tsHyxL1OI1GhVi6vVZhRkk')
