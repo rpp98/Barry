@@ -34,8 +34,8 @@ async def background_running_analysis():
             for coin in coin_list:
                 normal_results = []
                 results_cd = []            
-                coin_data = await get_candles(coin,60,period)
-                normal_results, results_current_div = analysis_RSIOBV(coin,coin_data,normal_results,results_current_div)
+                coin_data = await get_candles(coin,70,period)
+                normal_results, results_current_div = analysis_RSIOBVMACD(coin,coin_data,normal_results,results_current_div)
                 if len(normal_results) > 0:
                     for idx in range(len(normal_results)):
                         results_fr.append(normal_results[idx])
@@ -132,13 +132,12 @@ def calculateRSI(coin_data):
         last_avg_gain;float (to be used in void RSI calculations)
         last_avg_loss;float (to be used in void RSI calculations)
     """
-    import numpy
     change_list = []
     #Download and organize Price data into list
     for idx in range(len(coin_data)):
         change = float(coin_data[idx]['close'])-float(coin_data[idx]['open'])        
         change_list.append(change)
-    #creat total avg gain and loss lists with correct 0 values based on gains and losses
+    #create total avg gain and loss lists with correct 0 values based on gains and losses
     list_gain = []
     list_loss = []
     for change in change_list:
@@ -155,7 +154,7 @@ def calculateRSI(coin_data):
     list_rs = []
     last_avg_gain = 0
     last_avg_loss = 0
-    for idx in range(13,60):
+    for idx in range(13,70):
         if idx == 13:
             avg_gain = numpy.mean(list_gain[0:14])
             avg_loss = numpy.mean(list_loss[0:14])
@@ -171,7 +170,7 @@ def calculateRSI(coin_data):
             prev_avg_gain = avg_gain
             prev_avg_loss = avg_loss
         #for void price calculations
-        if idx == 58:            
+        if idx == 68:            
             last_avg_gain = prev_avg_gain
             last_avg_loss = prev_avg_loss
     #calculate RSI based off list_rs
@@ -187,16 +186,15 @@ def calculateRSI(coin_data):
 def calculate_obv(coin_data):
     """Calculate OBV for coin
     Parameters:
-        coin;str
         coin_data; list of dictionaries
     Returns:
-        list_OBV;list(list of floats)
+        list_OBV;list of floats
     """
     #Initialize list_OBV with starting value at 0 and prev_OBV with an arbitrary value of 0
     list_OBV = [0]
     prev_OBV = 0
     #Calculate OBV
-    for idx in range(1,len(coin_data)):
+    for idx in range(1,70):
         change_day = float(coin_data[idx]['close']) - float(coin_data[idx-1]['close'])
         change_volume = float(coin_data[idx]['volume'])
         if idx == 1:
@@ -206,7 +204,7 @@ def calculate_obv(coin_data):
                 new_OBV = 0 - change_volume
             else:
                 new_OBV = 0
-        elif idx > 1: 
+        else:
             if change_day > 0:
                 new_OBV = prev_OBV + change_volume
             elif change_day < 0:
@@ -227,6 +225,68 @@ def calculate_obv(coin_data):
     list_OBV = list_OBV[-28:]
     return list_OBV
 
+def calculate_macd(coin_data):
+    '''Calculate MACD for a coin organized into two lists: MACD line values and Signal Line values
+        Due to how MACD is calculated, coin_data needs at least 70 points of data (65 at least)
+    Parameters:
+        coin_data;list of dictionaries
+    Returns:
+        list_macd;list of floats
+        list_sigline;list of floats
+    '''
+    #Retrieve closes from coin_data
+    list_price = [float(adict['close']) for adict in coin_data]
+    #Set up constants for a 12 EMA and calculate
+    scontant_12 = 2 / 13
+    ema_12 = []
+    
+    for idx in range(11,70):
+        if idx == 11:
+            new_ema = numpy.mean(list_price[0:12])
+            ema_12.append(new_ema)
+            prev_ema = new_ema
+        else:
+            new_ema = (list_price[idx] - prev_ema) * scontant_12 + prev_ema
+            ema_12.append(new_ema)
+            prev_ema = new_ema
+            
+    #Set up constants for a 26 EMA and calculate
+    sconstant_26 = 2 / 27
+    ema_26 = []
+    for idx in range(25,70):
+        if idx == 25:
+            new_ema = numpy.mean(list_price[0:26])
+            ema_26.append(new_ema)
+            prev_ema = new_ema
+        else:
+            new_ema = (list_price[idx] - prev_ema) * sconstant_26 + prev_ema
+            ema_26.append(new_ema)
+            prev_ema = new_ema
+            
+    #Calculate MACD Line
+    list_macd = []
+    for idx in range(1,46):
+        amacd = ema_12[-idx] - ema_26[-idx]
+        list_macd.append(amacd)
+    list_macd.reverse()
+    #Calculate signal line
+    sconstant_9 = 1 / 10
+    list_sigline = []
+    for idx in range(8,45):
+        if idx == 8:
+            new_ema = numpy.mean(list_macd[0:8])
+            list_sigline.append(new_ema)
+            prev_ema = new_ema
+        else:
+            new_ema = (list_macd[idx] - prev_ema) * sconstant_9 + prev_ema
+            list_sigline.append(new_ema)
+            prev_ema = new_ema
+    #Reduce list_macd and list_sigline to 28 data points for further analysis
+    list_macd = list_macd[-28:]
+    list_sigline = list_sigline[-28:]
+    #Return statements
+    return list_macd, list_sigline
+
 def price_per_period(coin_data):
     """Extracts the closing prices for each period for a coin from coin_data
     Parameters:
@@ -245,7 +305,7 @@ def price_per_period(coin_data):
     list_price = list_price[-28:]
     return list_price
 
-def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss):
+def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_macd,list_sigline):
     """Determines trend of Price, RSI, and OBV
         Determines if RSI bullish divergence or OBV bullish divergence occurs
     Parameters:
@@ -254,10 +314,13 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss):
         list_OBV;list of floats
         last_avg_gain;float
         last_avg_loss;float
+        list_macd;list of floats
+        list_sigline;list of floats
     Returns:
         trend_price;bool
         trend_RSI;bool
         trend_OBV;bool
+        trend_MACD;bool
         score_RSI;float
         score_OBV;float
         current_div_RSI;tuple (bool,float)
@@ -296,13 +359,17 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss):
         ll_price.append(ll_price_broad[-1])
         ll_idx.append(ll_idx_broad[-1])
     #Find local lows for RSI and OBV according to the local low indices (ll_idx) for comparison against Price
-    #Initialize ll_RSI and ll_OBV
+    #Initialize lists
     ll_RSI = []
     ll_OBV = []
+    ll_MACD_macd = []
+    ll_MACD_sigline = []
     #Add correct RSIs and OBVs according to ll_idx
     for idx in ll_idx:
         ll_RSI.append(list_RSI[idx])
         ll_OBV.append(list_OBV[idx])
+        ll_MACD_macd.append(ll_MACD_macd[idx])
+        ll_MACD_sigline.append(ll_MACD_sigline[idx])
     """
     #Testing statements for bug fixing (unnecessary for normal use)
     print(ll_idx_broad)
@@ -325,7 +392,7 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss):
     trend_price = True 
     trend_RSI = False
     trend_OBV = False
-    
+    trend_MACD = False
     #Determine trend_price
     threshold = 1
     counter_trend_price = 0
@@ -395,39 +462,57 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss):
             counter_trend_OBV += 1
             score_OBV_OBV = (abs(ll_OBV[idx - 1] - ll_OBV[idx]) / (ll_OBV[idx - 1])) * 100
             score_OBV_price = ((abs(ll_price[idx - 1] - ll_price[idx]) / (ll_price[idx - 1])) * 100) + 1
-            score_OBV.append(abs(round(score_OBV_OBV *score_OBV_price,2)))
+            score_OBV.append(abs(round(score_OBV_OBV * score_OBV_price,2)))
             #Record position of divergence
             obv_div_idx.append(28 - ll_idx[idx - 1])
             obv_div_idx.append(28 - ll_idx[idx])
     #Determine trend_OBV based on number of divergences (at least 1)
     if counter_trend_OBV >= threshold:
         trend_OBV = True
-    return trend_price,trend_RSI,trend_OBV,score_RSI,score_OBV,current_div_RSI,void_price,rsi_div_idx,obv_div_idx
 
-def comparator_results_compiler(coin,trend_RSI,trend_OBV,score_RSI,score_OBV,rsi_div_idx,obv_div_idx,full_results):
+    #determine trend of MACD
+    #Initialize score_MACD and counter_trend_MACD
+    score_MACD = []
+    counter_trend_MACD = 0
+    macd_div_idx = []
+    #Calculate score for any divergence and increase MACD divergence counter
+    for idx in range(1,len(ll_price)):
+        if (ll_price[idx] - ll_price[idx - 1]) < 0 and (ll_MACD_macd[idx] - ll_MACD_macd[idx - 1]) > 0 and (ll_MACD_sigline[idx] - ll_MACD_sigline[idx - 1]) > 0:
+            counter_trend_MACD += 1
+            score_MACD_MACD = (abs(ll_MACD_sigline[idx - 1] - ll_MACD_sigline[idx]) / (ll_MACD_sigline[idx - 1])) * 100
+            score_MACD_price = ((abs(ll_price[idx - 1] - ll_price[idx]) / (ll_price[idx - 1])) * 100) + 1
+            score_MACD.append(abs(round(score_MACD_MACD * score_MACD_price,2)))
+            #Record position of divergence
+            macd_div_idx.append(28 - ll_idx[idx - 1])
+            macd_div_idx.append(28 - ll_idx[idx])
+    #Deterine trend_MACD based on number of divergences (at least 1)
+    if counter_trend_MACD >= threshold:
+        trend_MACD = True
+
+    return trend_price,trend_RSI,trend_OBV,trend_MACD,score_RSI,score_OBV,score_MACD,current_div_RSI,void_price,rsi_div_idx,obv_div_idx
+
+def comparator_results_compiler(coin,trend_RSI,trend_OBV,score_RSI,score_OBV,score_MACD,rsi_div_idx,obv_div_idx,full_results):
     """Prints results from comparator (divergence and score if applicable) and returns a tuple with (coin,divergences)
     Parameters:
         trend_price;bool
         trend_RSI;bool
         trend_OBV;bool
+        trend_MACD;bool
         coin;str
         score_RSI;float
         score_OBV;float
     Returns:
         full_results;list of dictionaries(dictionaries contain information on divergences)
     """
-    #Add correct results and labels to full_results
-    if trend_RSI == True and trend_OBV == True:
+    if trend_RSI == True:
         for idx in range(len(score_RSI)):
             full_results.append({'coin':coin,'type div':'RSI Divergence','score':score_RSI[idx],'position':[rsi_div_idx[idx * 2],rsi_div_idx[(idx * 2) + 1]]})
+    if trend_OBV == True:
         for idx in range(len(score_OBV)):
             full_results.append({'coin':coin,'type div':'OBV Divergence','score':score_OBV[idx],'position':[obv_div_idx[idx * 2],obv_div_idx[(idx * 2) + 1]]})
-    elif trend_RSI == True and trend_OBV == False:
-        for idx in range(len(score_RSI)):
-            full_results.append({'coin':coin,'type div':'RSI Divergence','score':score_RSI[idx],'position':[rsi_div_idx[idx * 2],rsi_div_idx[(idx * 2) + 1]]})
-    elif trend_RSI == False and trend_OBV == True:
-        for idx in range(len(score_OBV)):
-            full_results.append({'coin':coin,'type div':'OBV Divergence','score':score_OBV[idx],'position':[obv_div_idx[idx * 2],obv_div_idx[(idx * 2) + 1]]})
+    if trend_MACD == True:
+        for idx in range(len(score_MACD)):
+            full_results.append({'coin':coin,'type div':'MACD Divergence','score':score_MACD[idx],'position':[macd_div_idx[idx * 2],macd_div_idx[(idx * 2) + 1]]})
     return full_results
 
 def current_div_results_compiler(coin,current_div_RSI,void_price,list_price,current_div_results):
@@ -489,18 +574,19 @@ def pre_comparator(list_price):
         
 coins_failure = ['CLOAKBTC','GRSBTC','QLCBTC','ONTBTC','POABTC','STORMBTC','SYSBTC','WPRBTC','XEMBTC','ZILBTC']
 
-def analysis_RSIOBV(coin,coin_data,full_results,current_div_results):
+def analysis_RSIOBVMACD(coin,coin_data,full_results,current_div_results):
     list_price = price_per_period(coin_data)
         #Runs full analysis if downtrend in price is detected
     if False == pre_comparator(list_price):
-        #Calculates RSI and OBV 
+        #Calculates RSI and OBV and MACD
         list_RSI,last_avg_gain,last_avg_loss = calculateRSI(coin_data)
         list_OBV = calculate_obv(coin_data)
+        list_macd,list_sigline = calculate_macd(coin_data)
          #Determines trend of Price, RSI, and OBV
-        trend_price,trend_RSI,trend_OBV,score_RSI,score_OBV,current_div_RSI,void_price,rsi_div_idx,obv_div_idx = comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss)
+        trend_price,trend_RSI,trend_OBV,trend_MACD,score_RSI,score_OBV,score_MACD,current_div_RSI,void_price,rsi_div_idx,obv_div_idx = comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_macd,list_sigline)
         #test_plot(list_price,list_RSI,list_OBV) #This line is meant to be used for testing in coordination with coin_list1
         #Compile into dictionaries for mapping and results during printing
-        full_results = comparator_results_compiler(coin,trend_RSI,trend_OBV,score_RSI,score_OBV,rsi_div_idx,obv_div_idx,full_results)
+        full_results = comparator_results_compiler(coin,trend_RSI,trend_OBV,trend_MACD,score_RSI,score_OBV,score_MACD,rsi_div_idx,obv_div_idx,full_results)
         current_div_results = current_div_results_compiler(coin,current_div_RSI,void_price,list_price,current_div_results)
     return full_results,current_div_results
         
@@ -518,7 +604,7 @@ def full_results_to_str(full_results):
         dct = full_results[idx]
         result = '**{}** | {} | Score: {} | Divergence from {} to {} periods ago\n'.format(dct['coin'],dct['type div'],dct['score'],dct['position'][1],dct['position'][0])
         result_message = result_message + result
-        #organizes into groups of 13
+        #organizes into groups of 20
         if (idx + 1) % 20 == 0 or idx == (len(full_results) - 1):
             temp_list.append(result_message)
             full_results_str_list.append(temp_list)
