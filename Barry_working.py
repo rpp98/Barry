@@ -489,9 +489,9 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_mac
     if counter_trend_MACD >= threshold:
         trend_MACD = True
 
-    return trend_price,trend_RSI,trend_OBV,trend_MACD,score_RSI,score_OBV,score_MACD,current_div_RSI,void_price,rsi_div_idx,obv_div_idx
+    return trend_price,trend_RSI,trend_OBV,trend_MACD,score_RSI,score_OBV,score_MACD,current_div_RSI,void_price,rsi_div_idx,obv_div_idx,macd_div_idx
 
-def comparator_results_compiler(coin,trend_RSI,trend_OBV,trend_MACD,score_RSI,score_OBV,score_MACD,rsi_div_idx,obv_div_idx,full_results):
+def comparator_results_compiler(coin,trend_RSI,trend_OBV,trend_MACD,score_RSI,score_OBV,score_MACD,rsi_div_idx,obv_div_idx,macd_div_idx,full_results):
     """Prints results from comparator (divergence and score if applicable) and returns a tuple with (coin,divergences)
     Parameters:
         trend_price;bool
@@ -583,10 +583,10 @@ def analysis_RSIOBVMACD(coin,coin_data,full_results,current_div_results):
         list_OBV = calculate_obv(coin_data)
         list_macd,list_sigline = calculate_macd(coin_data)
          #Determines trend of Price, RSI, and OBV
-        trend_price,trend_RSI,trend_OBV,trend_MACD,score_RSI,score_OBV,score_MACD,current_div_RSI,void_price,rsi_div_idx,obv_div_idx = comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_macd,list_sigline)
+        trend_price,trend_RSI,trend_OBV,trend_MACD,score_RSI,score_OBV,score_MACD,current_div_RSI,void_price,rsi_div_idx,obv_div_idx,macd_div_idx = comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_macd,list_sigline)
         #test_plot(list_price,list_RSI,list_OBV) #This line is meant to be used for testing in coordination with coin_list1
         #Compile into dictionaries for mapping and results during printing
-        full_results = comparator_results_compiler(coin,trend_RSI,trend_OBV,trend_MACD,score_RSI,score_OBV,score_MACD,rsi_div_idx,obv_div_idx,full_results)
+        full_results = comparator_results_compiler(coin,trend_RSI,trend_OBV,trend_MACD,score_RSI,score_OBV,score_MACD,rsi_div_idx,obv_div_idx,macd_div_idx,full_results)
         current_div_results = current_div_results_compiler(coin,current_div_RSI,void_price,list_price,current_div_results)
     return full_results,current_div_results
         
