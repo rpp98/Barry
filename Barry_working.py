@@ -274,7 +274,7 @@ def calculate_macd(coin_data):
     list_sigline = []
     for idx in range(8,45):
         if idx == 8:
-            new_ema = numpy.mean(list_macd[0:8])
+            new_ema = numpy.mean(list_macd[0:9])
             list_sigline.append(new_ema)
             prev_ema = new_ema
         else:
