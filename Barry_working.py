@@ -368,8 +368,8 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_mac
     for idx in ll_idx:
         ll_RSI.append(list_RSI[idx])
         ll_OBV.append(list_OBV[idx])
-        ll_MACD_macd.append(ll_MACD_macd[idx])
-        ll_MACD_sigline.append(ll_MACD_sigline[idx])
+        ll_MACD_macd.append(list_macd[idx])
+        ll_MACD_sigline.append(list_sigline[idx])
     """
     #Testing statements for bug fixing (unnecessary for normal use)
     print(ll_idx_broad)
