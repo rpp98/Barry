@@ -491,7 +491,7 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_mac
 
     return trend_price,trend_RSI,trend_OBV,trend_MACD,score_RSI,score_OBV,score_MACD,current_div_RSI,void_price,rsi_div_idx,obv_div_idx
 
-def comparator_results_compiler(coin,trend_RSI,trend_OBV,score_RSI,score_OBV,score_MACD,rsi_div_idx,obv_div_idx,full_results):
+def comparator_results_compiler(coin,trend_RSI,trend_OBV,trend_MACD,score_RSI,score_OBV,score_MACD,rsi_div_idx,obv_div_idx,full_results):
     """Prints results from comparator (divergence and score if applicable) and returns a tuple with (coin,divergences)
     Parameters:
         trend_price;bool
