@@ -34,7 +34,7 @@ async def background_running_analysis():
             for coin in coin_list:
                 normal_results = []
                 results_cd = []            
-                coin_data = await get_candles(coin,70,period)
+                coin_data = await get_candles(coin,80,period)
                 normal_results, results_current_div = analysis_RSIOBVMACD(coin,coin_data,normal_results,results_current_div)
                 if len(normal_results) > 0:
                     for idx in range(len(normal_results)):
@@ -95,10 +95,10 @@ async def currentdiv(ctx,time_frame:str):
 @bot.command(pass_context=True)
 async def helpme(ctx):
     embed = discord.Embed(title='Help Guide',description='A quick overview of the bot')
-    embed.set_author(name='RSI and OBV Divergence Indicator')
+    embed.set_author(name='RSI, OBV, and MACD Divergence Indicator')
     embed.add_field(name='Valid Time Frames (written how is):',value='1hour, 2hour, 4hour, 6hour, 8hour, 12hour, 1day')
-    embed.add_field(name='Commands:',value='$helpme,$histdiv (time frame),$currentdiv (time frame)')
-    embed.add_field(name='Calculates/Finds?',value='RSI and OBV Divergences (within 28 periods) and possible forming RSI Divergences')
+    embed.add_field(name='Commands:',value='$helpme, $histdiv (time frame),$currentdiv (time frame)')
+    embed.add_field(name='Calculates/Finds?',value='RSI, OBV, and MACD Divergences (within 28 periods) and possible forming RSI Divergences')
     await bot.say(embed=embed)
 
 async def get_candles(coin,limitK,period):
@@ -154,7 +154,7 @@ def calculateRSI(coin_data):
     list_rs = []
     last_avg_gain = 0
     last_avg_loss = 0
-    for idx in range(13,70):
+    for idx in range(13,80):
         if idx == 13:
             avg_gain = numpy.mean(list_gain[0:14])
             avg_loss = numpy.mean(list_loss[0:14])
@@ -170,7 +170,7 @@ def calculateRSI(coin_data):
             prev_avg_gain = avg_gain
             prev_avg_loss = avg_loss
         #for void price calculations
-        if idx == 68:            
+        if idx == 78:            
             last_avg_gain = prev_avg_gain
             last_avg_loss = prev_avg_loss
     #calculate RSI based off list_rs
@@ -194,7 +194,7 @@ def calculate_obv(coin_data):
     list_OBV = [0]
     prev_OBV = 0
     #Calculate OBV
-    for idx in range(1,70):
+    for idx in range(1,80):
         change_day = float(coin_data[idx]['close']) - float(coin_data[idx-1]['close'])
         change_volume = float(coin_data[idx]['volume'])
         if idx == 1:
@@ -240,7 +240,7 @@ def calculate_macd(coin_data):
     scontant_12 = 2 / 13
     ema_12 = []
     
-    for idx in range(11,70):
+    for idx in range(11,80):
         if idx == 11:
             new_ema = numpy.mean(list_price[0:12])
             ema_12.append(new_ema)
@@ -253,7 +253,7 @@ def calculate_macd(coin_data):
     #Set up constants for a 26 EMA and calculate
     sconstant_26 = 2 / 27
     ema_26 = []
-    for idx in range(25,70):
+    for idx in range(25,80):
         if idx == 25:
             new_ema = numpy.mean(list_price[0:26])
             ema_26.append(new_ema)
@@ -265,14 +265,14 @@ def calculate_macd(coin_data):
             
     #Calculate MACD Line
     list_macd = []
-    for idx in range(1,46):
+    for idx in range(1,56):
         amacd = ema_12[-idx] - ema_26[-idx]
         list_macd.append(amacd)
     list_macd.reverse()
     #Calculate signal line
     sconstant_9 = 1 / 10
     list_sigline = []
-    for idx in range(8,45):
+    for idx in range(8,55):
         if idx == 8:
             new_ema = numpy.mean(list_macd[0:9])
             list_sigline.append(new_ema)
@@ -409,7 +409,6 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_mac
     current_div_RSI = (False,0)
     #Determine if RSi is currently diverging and calculate score (% change in price * RSI change)
     if list_price[-1] < ll_price[-1] and list_RSI[-1] > ll_RSI[-1]:
-        (bool,score) = current_div_RSI
         score_div_RSI = abs(ll_RSI[-1] - list_RSI[-1])
         score_div_price = ((abs(ll_price[-1] - list_price[-1]) / (ll_price[-1])) * 100) + 1
         current_div_RSI = (True,round(score_div_RSI*score_div_price,2))
@@ -460,7 +459,7 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_mac
     for idx in range(1,len(ll_price)):
         if (ll_price[idx] - ll_price[idx - 1]) < 0 and (ll_OBV[idx] - ll_OBV[idx - 1]) > 0:
             counter_trend_OBV += 1
-            score_OBV_OBV = (abs(ll_OBV[idx - 1] - ll_OBV[idx]) / (ll_OBV[idx - 1])) * 100
+            score_OBV_OBV = (abs(ll_OBV[idx - 1] - ll_OBV[idx]) / (ll_OBV[idx - 1])) * 10
             score_OBV_price = ((abs(ll_price[idx - 1] - ll_price[idx]) / (ll_price[idx - 1])) * 100) + 1
             score_OBV.append(abs(round(score_OBV_OBV * score_OBV_price,2)))
             #Record position of divergence
