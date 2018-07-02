@@ -82,14 +82,15 @@ async def currentdiv(ctx,time_frame:str):
         #Format results into lists of strings for embedding and avoiding max length for messages in discord and embeds and based on value of 'score'
         cd_results_sorted = sort_based_on_score(results_desired_cd)
         cdr_str_list = current_div_results_to_str(cd_results_sorted)
-        #Reorganize results based on score value
-       
         tf_converter_print = {'1hour':'1 hour','2hour':'2 hour','4hour':'4 hour','6hour':'6 hour','8hour':'8 hour','12hour':'12 hour','1day':'1 day'}
         #Print embed statements to Discord
         for idx in range(len(cdr_str_list)):
             embed_title = 'Current Possible RSI Divergences (Part {} of {})'.format(idx + 1,len(cdr_str_list))
             message = cdr_str_list[idx][0]
             embed = discord.Embed(title=embed_title,description=message)
+            await bot.say(embed=embed)
+        if len(cdr_str_list) == 0:
+            embed = discord.Embed(title='Current Possible RSI Divergences',description='None')
             await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
