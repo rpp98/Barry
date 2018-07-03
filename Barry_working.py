@@ -602,7 +602,7 @@ def full_results_to_str(full_results):
     result_message = ''
     for idx in range(len(full_results)):
         dct = full_results[idx]
-        result = '**{}** | {} | Score: {} | Divergence {} to {} periods ago\n'.format(dct['coin'],dct['type div'],dct['score'],dct['position'][1],dct['position'][0])
+        result = '**{}** | {} | Score: {} | Divergence {} to {} periods ago\n'.format(dct['coin'],dct['type div'],dct['score'],dct['position'][1] - 1,dct['position'][0] - 1)
         result_message = result_message + result
         #organizes into groups of 20
         if (idx + 1) % 20 == 0 or idx == (len(full_results) - 1):
