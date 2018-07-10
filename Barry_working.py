@@ -82,6 +82,7 @@ async def currentdiv(ctx,time_frame:str):
         #Format results into lists of strings for embedding and avoiding max length for messages in discord and embeds and based on value of 'score'
         cd_results_sorted = sort_based_on_score(results_desired_cd)
         cdr_str_list = current_div_results_to_str(cd_results_sorted)
+
         tf_converter_print = {'1hour':'1 hour','2hour':'2 hour','4hour':'4 hour','6hour':'6 hour','8hour':'8 hour','12hour':'12 hour','1day':'1 day'}
         #Print embed statements to Discord
         for idx in range(len(cdr_str_list)):
@@ -89,16 +90,32 @@ async def currentdiv(ctx,time_frame:str):
             message = cdr_str_list[idx][0]
             embed = discord.Embed(title=embed_title,description=message)
             await bot.say(embed=embed)
-        if len(cdr_str_list) == 0:
-            embed = discord.Embed(title='Current Possible RSI Divergences',description='None')
-            await bot.say(embed=embed)
+
+@bot.command(pass_context=True)
+async def tripdiv(ctx,time_frame:str):
+    valid_time_frames = ['1hour','2hour','4hour','6hour','8hour','12hour','1day']
+    if time_frame not in valid_time_frames:
+        await bot.say('Not a valid timeframe to analyze for')
+        await bot.say('Valid Time Frames are: {}'.format(valid_time_frames))
+    else:
+        #Retrieve results from background task
+        tf_to_period = {'1hour':'1h','2hour':'2h','4hour':'4h','6hour':'6h','8hour':'8h','12hour':'12h','1day':'1d'}
+        results_dict = bot.results_dict
+        results_desired_fr,results_desired_cd = results_dict[tf_to_period[time_frame]]
+        #Find triple divergences
+        trip_divs = find_tripdivs(results_desired_fr)
+        #Format embed message for tripdivs
+        tf_converter_print = {'1hour':'1 hour','2hour':'2 hour','4hour':'4 hour','6hour':'6 hour','8hour':'8 hour','12hour':'12 hour','1day':'1 day'}
+        message = tripdivs_message(trip_divs)
+        embed_title = 'Historical Triple Divergence(s) for {} Candles'.format(tf_converter_print[time_frame])
+        embed = discord.Embed(title=embed_title,description=message)
 
 @bot.command(pass_context=True)
 async def helpme(ctx):
     embed = discord.Embed(title='Help Guide',description='A quick overview of the bot')
-    embed.set_author(name='RSI, OBV, and MACD Divergence Indicator')
+    embed.set_author(name='Triple Divergence Indicator (RSI/OBV/MACD)')
     embed.add_field(name='Valid Time Frames (written how is):',value='1hour, 2hour, 4hour, 6hour, 8hour, 12hour, 1day')
-    embed.add_field(name='Commands:',value='$helpme, $histdiv (time frame),$currentdiv (time frame)')
+    embed.add_field(name='Commands:',value='$helpme \n$histdiv (time frame) \n$currentdiv (time frame) \n$tripdiv (time frame')
     embed.add_field(name='Calculates/Finds?',value='RSI, OBV, and MACD Divergences (within 28 periods) and possible forming RSI Divergences')
     await bot.say(embed=embed)
 
@@ -477,7 +494,7 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_mac
     macd_div_idx = []
     #Calculate score for any divergence and increase MACD divergence counter
     for idx in range(1,len(ll_price)):
-        if (ll_price[idx] - ll_price[idx - 1]) < 0 and (ll_MACD_macd[idx] - ll_MACD_macd[idx - 1]) > 0 and (ll_MACD_sigline[idx] - ll_MACD_sigline[idx - 1]) > 0:
+        if (ll_price[idx] - ll_price[idx - 1]) and ((ll_MACD_macd[idx] + ll_MACD_sigline[idx]) / 2) > ((ll_MACD_macd[idx - 1] + ll_MACD_sigline[idx - 1]) / 2):
             counter_trend_MACD += 1
             score_MACD_MACD = (abs(ll_MACD_sigline[idx - 1] - ll_MACD_sigline[idx]) / (ll_MACD_sigline[idx - 1])) * 10
             score_MACD_price = ((abs(ll_price[idx - 1] - ll_price[idx]) / (ll_price[idx - 1])) * 100) + 1
@@ -575,6 +592,16 @@ def pre_comparator(list_price):
 coins_failure = ['CLOAKBTC','GRSBTC','QLCBTC','ONTBTC','POABTC','STORMBTC','SYSBTC','WPRBTC','XEMBTC','ZILBTC']
 
 def analysis_RSIOBVMACD(coin,coin_data,full_results,current_div_results):
+    '''Main analysis function that runs and compiles all data into dictionaries for coins based on trends for RSI, OBV, and MACD
+    Parameters:
+        coin;str
+        coin_data;list of dictionaries
+        full_results;list of dictionaries
+        current_div_results;list of dictionaries
+    Returns:
+        full_results;list of dictionaries
+        current_div_results;list of dictionaries
+    '''
     list_price = price_per_period(coin_data)
         #Runs full analysis if downtrend in price is detected
     if False == pre_comparator(list_price):
@@ -602,7 +629,7 @@ def full_results_to_str(full_results):
     result_message = ''
     for idx in range(len(full_results)):
         dct = full_results[idx]
-        result = '**{}** | {} | Score: {} | Divergence {} to {} periods ago\n'.format(dct['coin'],dct['type div'],dct['score'],dct['position'][1] - 1,dct['position'][0] - 1)
+        result = '**{}** | {} | Score: {} | Divergence {} to {} periods ago\n'.format(dct['coin'],dct['type div'],dct['score'],dct['position'][1],dct['position'][0])
         result_message = result_message + result
         #organizes into groups of 20
         if (idx + 1) % 20 == 0 or idx == (len(full_results) - 1):
@@ -672,5 +699,40 @@ def reformat_overflow_str(price):
         elif overflow == 1:
             price = '{:.7f}'.format(price)
     return price
+
+def find_tripdivs(full_results):
+    '''Finds all coins with triple divergences (RSI, OBV, and MACD)
+    Parameters:
+        full_results;list of dictionaries
+    Returns:
+        trip_divs;list of strings
+    '''
+    list_divs_RSI = []
+    list_divs_OBV = []
+    list_divs_MACD = []
+    for adict in full_results:
+        if adict['type div'] == 'RSI Divergence':
+            list_divs_RSI.append(adict['coin'])
+        if adict['type div'] == 'OBV Divergence':
+            list_divs_OBV.append(adict['coin'])
+        if adict['type div'] == 'MACD Divergence':
+            list_divs_MACD.append(adict['coin'])
+    trip_divs = []
+    for coin in list_divs_RSI:
+        if coin in list_divs_OBV and coin in list_divs_MACD:
+            trip_divs.append(coin)
+    return trip_divs
+
+def tripdivs_message(trip_divs):
+    '''Create message to be printed in embed for $tripdiv
+    Parameters:
+        trip_divs;list of strings
+    Returns:
+        tripdiv_message;str
+    '''
+    message = ''
+    for coin in trip_divs:
+        message = message + '{} \n'.format(coin)
+    return message
 
 bot.run('NDU3Nzc0NTU4MTcxMjM0MzA0.DgeAkw.tzs04tsHyxL1OI1GhVi6vVZhRkk')
