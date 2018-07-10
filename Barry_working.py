@@ -109,6 +109,7 @@ async def tripdiv(ctx,time_frame:str):
         message = tripdivs_message(trip_divs)
         embed_title = 'Historical Triple Divergence(s) for {} Candles'.format(tf_converter_print[time_frame])
         embed = discord.Embed(title=embed_title,description=message)
+        await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
 async def helpme(ctx):
@@ -117,6 +118,29 @@ async def helpme(ctx):
     embed.add_field(name='Valid Time Frames (written how is):',value='1hour, 2hour, 4hour, 6hour, 8hour, 12hour, 1day')
     embed.add_field(name='Commands:',value='$helpme \n$histdiv (time frame) \n$currentdiv (time frame) \n$tripdiv (time frame')
     embed.add_field(name='Calculates/Finds?',value='RSI, OBV, and MACD Divergences (within 28 periods) and possible forming RSI Divergences')
+    await bot.say(embed=embed)
+
+@bot.command(pass_context=True)
+async def howmany(ctx):
+    results_dict = bot.results_dict
+    time_frames = ['1h','2h','4h','6h','8h','12h','1d']
+    tf_to_period = {'1hour':'1h','2hour':'2h','4hour':'4h','6hour':'6h','8hour':'8h','12hour':'12h','1day':'1d'}
+    fr_divs = []
+    cd_divs = []
+    t_divs  = []
+    #determine number of divergence for historical, current, and triples
+    for time_frame in time_frames:
+        full_results, current_div_results = results_dict[time_frame]
+        fr_divs.append(len(full_results))
+        cd_divs.append(len(current_div_results))
+        trip_divs = find_tripdivs(full_results)
+        t_divs.append(len(trip_divs))
+    #Form message for embed
+    fr_msg, cd_msg, t_msg = howmany_message(fr_divs,cd_divs,t_divs)
+    embed = discord.Embed(title='Number of Divergence for all Analyses',description='Analyses = Historical, Current, Triple')
+    embed.add_field(name='$histdiv',value=fr_msg)
+    embed.add_field(name='$currentdiv',value=cd_msg)
+    embed.add_field(name='$tripdiv',value=t_msg)
     await bot.say(embed=embed)
 
 async def get_candles(coin,limitK,period):
@@ -733,6 +757,32 @@ def tripdivs_message(trip_divs):
     message = ''
     for coin in trip_divs:
         message = message + '{} \n'.format(coin)
-    return message
+    if len(message) == 0:
+        message = 'None'
+    return message 
+
+def howmany_message(fr_divs,cd_divs,t_divs):
+    '''Creates message to be printed in embed for $howmany
+    Parameters:
+        fr_divs;list of ints
+        cd_divs;list of ints
+        t_divs;list of ints
+    Returns:
+        message;str
+    '''
+    periods = ['1 hour', '2hour', '4hour', '6 hour', '8 hour', '12 hour', '1 day']
+    fr_msg = ''
+    for idx in range(len(fr_divs)):
+        new_msg = '{}: {} divergences \n'.format(periods[idx], fr_divs[idx])
+        fr_msg = fr_msg + new_msg
+    cd_msg = ''
+    for idx in range(len(cd_divs)):
+        new_msg = '{}: {} divergences \n'.format(periods[idx], cd_divs[idx])
+        cd_msg = cd_msg + new_msg
+    t_msg = ''
+    for idx in range(len(t_divs)):
+        new_msg = '{}: {} divergences \n'.format(periods[idx], t_divs[idx])
+        t_msg = t_msg + new_msg
+    return fr_msg, cd_msg, t_msg
 
 bot.run('NDU3Nzc0NTU4MTcxMjM0MzA0.DgeAkw.tzs04tsHyxL1OI1GhVi6vVZhRkk')
