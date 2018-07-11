@@ -405,6 +405,10 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_mac
     idx_counter = 1
     #Find local lows of the local lows for Price (ll_price)
     for idx in range(1,len(ll_price_broad) - 1):
+        if (ll_price_broad[idx -1] - ll_price_broad[idx]) > 0:
+            if ll_price_broad[idx - 1] not in ll_price:
+                ll_price.append(ll_price_broad[idx - 1])
+                ll_idx.append(ll_idx_broad[idx_counter - 1])
         if ll_price_broad[idx] < ll_price_broad[idx-1] and ll_price_broad[idx] < ll_price_broad[idx+1]:
             ll_price.append(ll_price_broad[idx])
             ll_idx.append(ll_idx_broad[idx_counter])
@@ -605,21 +609,28 @@ def pre_comparator(list_price):
     #Initialize ll_price_broad and ll_price
     ll_price_broad = []
     ll_price = []
+
     #Find local lows of price
     for idx in range(1,len(list_price) - 1):
         if list_price[idx] < list_price[idx - 1] and list_price[idx] < list_price[idx + 1]:
             ll_price_broad.append(list_price[idx])
+
     #Find the local lows of the local lows for price
     idx_counter = 1
     for idx in range(1,len(ll_price_broad) - 1):
+        if (ll_price_broad[idx - 1] - ll_price_broad[idx]) > 0:
+            if ll_price_broad[idx - 1] not in ll_price:
+                ll_price.append(ll_price_broad[idx -1])
         if ll_price_broad[idx] < ll_price_broad[idx - 1] and ll_price_broad[idx] < ll_price_broad[idx + 1]:
             ll_price.append(ll_price_broad[idx])
+
     #Determine if endpoints of the list are lows (despite missing one point for comparison) and add if applicable
     if len(ll_price_broad) > 1: #Prevents error with list of len == 1
         if ll_price_broad[0] < ll_price_broad[1]:
             ll_price.insert(0,ll_price_broad[0])
         if ll_price_broad[-1] < ll_price_broad[-2]:
             ll_price.append(ll_price_broad[-1])
+
     #Determine trend_price
     trend_price = True
     threshold = 1
@@ -629,6 +640,7 @@ def pre_comparator(list_price):
             counter_trend_price += 1
     if counter_trend_price >= threshold:
         trend_price = False
+
     return trend_price
         
 coins_failure = ['CLOAKBTC','GRSBTC','QLCBTC','ONTBTC','POABTC','STORMBTC','SYSBTC','WPRBTC','XEMBTC','ZILBTC']
