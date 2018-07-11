@@ -644,7 +644,7 @@ def analysis_RSIOBVMACD(coin,coin_data,full_results,current_div_results):
         full_results;list of dictionaries
         current_div_results;list of dictionaries
     '''
-    #list_price = price_per_period(coin_data)
+    list_price = price_per_period(coin_data)
         #Runs full analysis if downtrend in price is detected
     if True:
         #Calculates RSI and OBV and MACD
