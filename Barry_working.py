@@ -143,6 +143,24 @@ async def howmany(ctx):
     embed.add_field(name='$tripdiv',value=t_msg)
     await bot.say(embed=embed)
 
+@bot.command(pass_context=True)
+async def coinsearch(ctx,coin:str):
+    coin_list = ['ADABTC','ADXBTC','AEBTC','AIONBTC','AMBBTC','APPCBTC','ARKBTC','ARNBTC','ASTBTC','BATBTC','BCCBTC','BCDBTC','BCPTBTC','BLZBTC','BNBBTC','BNTBTC','BQXBTC','BRDBTC','BTGBTC','BTSBTC','CDTBTC','CHATBTC','CMTBTC','CNDBTC','DASHBTC','DGDBTC','DLTBTC','DNTBTC','EDOBTC','ELFBTC','ENGBTC','ENJBTC','EOSBTC','ETCBTC','ETHBTC','EVXBTC','FUELBTC','FUNBTC','GASBTC','GTOBTC','GVTBTC','HSRBTC','ICNBTC','ICXBTC','INSBTC','IOSTBTC','IOTABTC','KMDBTC','KNCBTC','LENDBTC','LINKBTC','LRCBTC','LSKBTC','LTCBTC','LUNBTC','MANABTC','MCOBTC','MDABTC','MODBTC','MTHBTC','MTLBTC','NANOBTC','NAVBTC','NCASHBTC','NEBLBTC','NEOBTC','NULSBTC','OAXBTC','OMGBTC','ONTBTC','OSTBTC','PIVXBTC','POABTC','POEBTC','POWRBTC','PPTBTC','QTUMBTC','RCNBTC','RDNBTC','REQBTC','RLCBTC','RPXBTC','SALTBTC','SNMBTC','SNTBTC','SNGLSBTC','STEEMBTC','STORJBTC','STRATBTC','SUBBTC','TNBBTC','TNTBTC','TRIGBTC','TRXBTC','VENBTC','VIABTC','VIBBTC','VIBEBTC','WABIBTC','WAVESBTC','WINGSBTC','WTCBTC','XLMBTC','XMRBTC','XVGBTC','XRPBTC','XZCBTC','YOYOBTC','ZECBTC','ZRXBTC','BCCUSDT','BNBUSDT','BTCUSDT','ETHUSDT','LTCUSDT','NEOUSDT']
+    if coin not in coin_list:
+        await bot.say('Not a valid coin \nCommon Problems: \nCoin pairing not uppercase \nCoin pairing does not have enough data to be run for results \nMispelling')
+    else:
+        results_dict = bot.results_dict
+        msg_fr, msg_cd, msg_t = coinsearch_message(coin,results_dict)
+        embed = discord.Embed(title='Search Results for {}'.format(coin),description='Searched in $histdiv, $currentdiv, $tripdiv')
+        embed.add_field(name='$histdiv',value=msg_fr)
+        embed.add_field(name='$currentdiv',value=msg_cd)
+        embed.add_field(name='$tripdiv',value=msg_t)
+        await bot.say(embed=embed)
+
+            
+
+
+
 async def get_candles(coin,limitK,period):
     """Uses aiohttp to download data from Binance based on coin, period, and limit
     Parameters:
@@ -784,5 +802,39 @@ def howmany_message(fr_divs,cd_divs,t_divs):
         new_msg = '{}: {} divergences \n'.format(periods[idx], t_divs[idx])
         t_msg = t_msg + new_msg
     return fr_msg, cd_msg, t_msg
+
+def coinsearch_message(coin,results_dict):
+    '''Creates message to be printed in embed for $coinsearch
+    Parameters:
+        coin_found;list of dictionaries
+    Returns:
+        cs_msg;str
+    '''
+    periods = ['1 hour', '2hour', '4hour', '6 hour', '8 hour', '12 hour', '1 day']
+    time_frames = ['1h','2h','4h','6h','8h','12h','1d']
+    msg_fr = ''
+    msg_cd = ''
+    msg_t = ''
+    for time_frame in time_frames:
+        full_results, current_div_results = results_dict[time_frame]
+        #find occurrences in full_results
+        coins_fr = [adict['coin'] for adict in full_results]
+        if coin in coins_fr:
+            msg_fr = msg_fr + '{}: :white_check_mark:\n'.format(time_frame)
+        else:
+            msg_fr = msg_fr + '{}: :x:\n'.format(time_frame)
+        #find occurrences in current_div_results
+        coins_cd = [adict['coin'] for adict in current_div_results]
+        if coin in coins_cd:
+            msg_cd = msg_cd + '{}: :white_check_mark:\n'.format(time_frame)
+        else:
+            msg_cd = msg_cd + '{}: :x:\n'.format(time_frame)
+        #find occurrences in triple div
+        trip_divs = find_tripdivs(full_results)
+        if coin in trip_divs:
+            msg_t = msg_t + '{}: :white_check_mark:\n'.format(time_frame)
+        else:
+            msg_t = msg_t + '{}: :x:\n'.format(time_frame)
+    return msg_fr,msg_cd,msg_t
 
 bot.run('NDU3Nzc0NTU4MTcxMjM0MzA0.DgeAkw.tzs04tsHyxL1OI1GhVi6vVZhRkk')
