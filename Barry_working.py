@@ -849,4 +849,4 @@ def coinsearch_message(coin,results_dict):
             msg_t = msg_t + '{}: :x:\n'.format(time_frame)
     return msg_fr,msg_cd,msg_t
 
-bot.run('NDU3Nzc0NTU4MTcxMjM0MzA0.DgeAkw.tzs04tsHyxL1OI1GhVi6vVZhRkk')
+os.environ.get('TOKEN')
