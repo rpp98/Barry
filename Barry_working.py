@@ -850,5 +850,5 @@ def coinsearch_message(coin,results_dict):
     return msg_fr,msg_cd,msg_t
 
 
-my_token = os.environe.get('TOKEN')
+my_token = os.environ.get('TOKEN')
 bot.run(my_token)
