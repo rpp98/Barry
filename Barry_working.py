@@ -6,6 +6,7 @@ from discord.ext.commands import Bot
 import asyncio
 import numpy
 import aiohttp
+import os
 
 #Bot Command Prefix
 bot = commands.Bot(command_prefix='$')
