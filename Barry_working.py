@@ -833,7 +833,7 @@ def divs_filter(full_results):
     Returns:
         full_results;list of dictionaries
     '''
-    full_results[:] = [d for d in full_results if (d['position'][1] - d['position'][0]) >= 5]
+    full_results[:] = [d for d in full_results if abs((d['position'][1] - d['position'][0])) >= 5]
     return full_results
 
 def coinsearch_message(coin,results_dict):
