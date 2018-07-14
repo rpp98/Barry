@@ -162,9 +162,11 @@ async def coinsearch(ctx,coin:str):
         embed.add_field(name='$currentdiv',value=msg_cd)
         embed.add_field(name='$tripdiv',value=msg_t)
         await bot.say(embed=embed)
-        cs_r = ''.format()
+        await asyncio.sleep(0.1)
         embed = discord.Embed(title='Search Results for {}'.format(coin),description='*Results from $histdiv and $currentdiv')
-
+        embed.add_field(name='$histdiv',value=msg_fr_r)
+        embed.add_field(name='$currentdiv',value=msg_cd_r)
+        await bot.say(embed=embed)
             
 
 
