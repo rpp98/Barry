@@ -59,6 +59,7 @@ async def histdiv(ctx,time_frame:str):
         results_dict = bot.results_dict
         results_desired_fr,results_desired_cd = results_dict[tf_to_period[time_frame]]
         #Format results into lists of strings for embedding and avoiding max length for messages in discord and embeds and based on value of 'score'
+        results_desired_fr = divs_filter(results_desired_fr)
         full_results_sorted = sort_based_on_score(results_desired_fr)
         full_results_str_list = full_results_to_str(full_results_sorted)
         tf_converter_print = {'1hour':'1 hour','2hour':'2 hour','4hour':'4 hour','6hour':'6 hour','8hour':'8 hour','12hour':'12 hour','1day':'1 day'}
@@ -68,6 +69,7 @@ async def histdiv(ctx,time_frame:str):
             message = full_results_str_list[idx][0]
             embed = discord.Embed(title=embed_title,description=message)
             await bot.say(embed=embed)
+            await asyncio.sleep(0.1)
 
 @bot.command(pass_context=True)
 async def currentdiv(ctx,time_frame:str):
@@ -91,6 +93,7 @@ async def currentdiv(ctx,time_frame:str):
             message = cdr_str_list[idx][0]
             embed = discord.Embed(title=embed_title,description=message)
             await bot.say(embed=embed)
+            await asyncio.sleep(0.1)
 
 @bot.command(pass_context=True)
 async def tripdiv(ctx,time_frame:str):
@@ -117,8 +120,9 @@ async def helpme(ctx):
     embed = discord.Embed(title='Help Guide',description='A quick overview of the bot')
     embed.set_author(name='Triple Divergence Indicator (RSI/OBV/MACD)')
     embed.add_field(name='Valid Time Frames (written how is):',value='1hour, 2hour, 4hour, 6hour, 8hour, 12hour, 1day')
-    embed.add_field(name='Commands:',value='$helpme \n$histdiv (time frame) \n$currentdiv (time frame) \n$tripdiv (time frame')
+    embed.add_field(name='Commands:',value='$helpme \n$histdiv (time frame) \n$currentdiv (time frame) \n$tripdiv (time frame) \n$howmany \n$coinsearch (COINPAIRING)')
     embed.add_field(name='Calculates/Finds?',value='RSI, OBV, and MACD Divergences (within 28 periods) and possible forming RSI Divergences')
+    embed.add_field(name='Feedback?',value='Add me on Discord: rpp#9779')
     await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
@@ -132,13 +136,14 @@ async def howmany(ctx):
     #determine number of divergence for historical, current, and triples
     for time_frame in time_frames:
         full_results, current_div_results = results_dict[time_frame]
+        full_results = divs_filter(full_results)
         fr_divs.append(len(full_results))
         cd_divs.append(len(current_div_results))
         trip_divs = find_tripdivs(full_results)
         t_divs.append(len(trip_divs))
     #Form message for embed
     fr_msg, cd_msg, t_msg = howmany_message(fr_divs,cd_divs,t_divs)
-    embed = discord.Embed(title='Number of Divergence for all Analyses',description='Analyses = Historical, Current, Triple')
+    embed = discord.Embed(title='Number of Divergence for all Analyses',description='*Analyses = Historical, Current, Triple*')
     embed.add_field(name='$histdiv',value=fr_msg)
     embed.add_field(name='$currentdiv',value=cd_msg)
     embed.add_field(name='$tripdiv',value=t_msg)
@@ -148,7 +153,7 @@ async def howmany(ctx):
 async def coinsearch(ctx,coin:str):
     coin_list = ['ADABTC','ADXBTC','AEBTC','AIONBTC','AMBBTC','APPCBTC','ARKBTC','ARNBTC','ASTBTC','BATBTC','BCCBTC','BCDBTC','BCPTBTC','BLZBTC','BNBBTC','BNTBTC','BQXBTC','BRDBTC','BTGBTC','BTSBTC','CDTBTC','CHATBTC','CMTBTC','CNDBTC','DASHBTC','DGDBTC','DLTBTC','DNTBTC','EDOBTC','ELFBTC','ENGBTC','ENJBTC','EOSBTC','ETCBTC','ETHBTC','EVXBTC','FUELBTC','FUNBTC','GASBTC','GTOBTC','GVTBTC','HSRBTC','ICNBTC','ICXBTC','INSBTC','IOSTBTC','IOTABTC','KMDBTC','KNCBTC','LENDBTC','LINKBTC','LRCBTC','LSKBTC','LTCBTC','LUNBTC','MANABTC','MCOBTC','MDABTC','MODBTC','MTHBTC','MTLBTC','NANOBTC','NAVBTC','NCASHBTC','NEBLBTC','NEOBTC','NULSBTC','OAXBTC','OMGBTC','ONTBTC','OSTBTC','PIVXBTC','POABTC','POEBTC','POWRBTC','PPTBTC','QTUMBTC','RCNBTC','RDNBTC','REQBTC','RLCBTC','RPXBTC','SALTBTC','SNMBTC','SNTBTC','SNGLSBTC','STEEMBTC','STORJBTC','STRATBTC','SUBBTC','TNBBTC','TNTBTC','TRIGBTC','TRXBTC','VENBTC','VIABTC','VIBBTC','VIBEBTC','WABIBTC','WAVESBTC','WINGSBTC','WTCBTC','XLMBTC','XMRBTC','XVGBTC','XRPBTC','XZCBTC','YOYOBTC','ZECBTC','ZRXBTC','BCCUSDT','BNBUSDT','BTCUSDT','ETHUSDT','LTCUSDT','NEOUSDT']
     if coin not in coin_list:
-        await bot.say('Not a valid coin \nCommon Problems: \nCoin pairing not uppercase \nCoin pairing does not have enough data to be run for results \nMispelling')
+        await bot.say('**Not a valid coin** \n__Common Problems__: \nCoin pairing not uppercase \nCoin pairing does not have enough data to be run for results (will be added in the future) \nMispelling')
     else:
         results_dict = bot.results_dict
         msg_fr, msg_cd, msg_t = coinsearch_message(coin,results_dict)
@@ -709,7 +714,7 @@ def current_div_results_to_str(current_div_results):
         dct = current_div_results[idx]
         result = '**{}** | Score: {} | Void Price: {} | Current Price: {}\n'.format(dct['coin'],dct['score'],dct['void price'],dct['current price'])
         result_message = result_message + result
-        #organizes into groups of 7 to not exceed Character Limit 1024
+        #organizes into groups of 15 to not exceed Character Limit 1024
         if (idx + 1) % 15 == 0 or idx == (len(current_div_results) - 1):
             temp_list.append(result_message)
             cdr_str_list.append(temp_list)
@@ -775,7 +780,8 @@ def find_tripdivs(full_results):
     trip_divs = []
     for coin in list_divs_RSI:
         if coin in list_divs_OBV and coin in list_divs_MACD:
-            trip_divs.append(coin)
+            if coin not in trip_divs:
+                trip_divs.append(coin)
     return trip_divs
 
 def tripdivs_message(trip_divs):
@@ -786,8 +792,11 @@ def tripdivs_message(trip_divs):
         tripdiv_message;str
     '''
     message = ''
-    for coin in trip_divs:
-        message = message + '{} \n'.format(coin)
+    for idx in range(len(trip_divs)):
+        if (idx + 1) % 7 == 0 or idx == (len(trip_divs) - 1):
+            message = message + '{} \n'.format(coin)
+        else:
+            message = message + '{} '.format(coin)
     if len(message) == 0:
         message = 'None'
     return message 
@@ -816,6 +825,17 @@ def howmany_message(fr_divs,cd_divs,t_divs):
         t_msg = t_msg + new_msg
     return fr_msg, cd_msg, t_msg
 
+def divs_filter(full_results):
+    '''Reduces number of results in full_results by analyzing length of divergence period (5 or more only)
+    (in response to an accuracy update which captures quicker divergences)
+    Parameters:
+        full_results;list of dictionaries
+    Returns:
+        full_results;list of dictionaries
+    '''
+    full_results[:] = [d for d in full_results if (d['position'][1] - d['position'][0]) >= 5]
+    return full_results
+
 def coinsearch_message(coin,results_dict):
     '''Creates message to be printed in embed for $coinsearch
     Parameters:
@@ -830,6 +850,7 @@ def coinsearch_message(coin,results_dict):
     msg_t = ''
     for time_frame in time_frames:
         full_results, current_div_results = results_dict[time_frame]
+        full_results = divs_filter(full_results)
         #find occurrences in full_results
         coins_fr = [adict['coin'] for adict in full_results]
         if coin in coins_fr:
