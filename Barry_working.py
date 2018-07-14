@@ -784,7 +784,7 @@ def find_tripdivs(full_results):
                 trip_divs.append(coin)
     return trip_divs
 
-def tripdivs_message(trip_divs,coin):
+def tripdivs_message(trip_divs):
     '''Create message to be printed in embed for $tripdiv
     Parameters:
         trip_divs;list of strings
