@@ -892,7 +892,7 @@ def coinsearch_message(coin,results_dict):
             msg_t = msg_t + '{}: :x:\n'.format(time_frame)
     return msg_fr,msg_cd,msg_t,msg_fr_r,msg_cd_r
 
-def cs_msg_overflow_reformat(msg)
+def cs_msg_overflow_reformat(msg):
     '''Reformat msg to prevent exceeding Discord's character limit in Embeds (2000 for normal; 1024 in fields)
     Parameters:
         msg;string
