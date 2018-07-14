@@ -784,7 +784,7 @@ def find_tripdivs(full_results):
                 trip_divs.append(coin)
     return trip_divs
 
-def tripdivs_message(trip_divs):
+def tripdivs_message(trip_divs,coin):
     '''Create message to be printed in embed for $tripdiv
     Parameters:
         trip_divs;list of strings
@@ -793,6 +793,7 @@ def tripdivs_message(trip_divs):
     '''
     message = ''
     for idx in range(len(trip_divs)):
+        coin = trip_divs[idx]
         if (idx + 1) % 7 == 0 or idx == (len(trip_divs) - 1):
             message = message + '{} \n'.format(coin)
         else:
@@ -860,36 +861,37 @@ def coinsearch_message(coin,results_dict):
             msg_fr = msg_fr + '{}: :white_check_mark:\n'.format(time_frame)
         else:
             msg_fr = msg_fr + '{}: :x:\n'.format(time_frame)
-        msg_fr_r = msg_fr_r = '__{}__\n'.format(tf_converter[time_frame])
-        for r in full_results:
-            if r['coin'] == coin:
-                result = '**{}** | {} | Score: {} | Divergence {} to {} periods ago\n'.format(r['coin'],r['type div'],r['score'],r['position'][1],r['position'][0])
-                msg_fr_r = msg_fr_r + result
+        #Format message for $tripdiv
         coin_appearance = [c for c in full_results if coin == c['coin']]
-        if len(coin_appearance) == 0:
-            strip_msg = '__{}__\n'.format(tf_converter[time_frame])
-            msg_fr_r = msg_fr_r.split(strip_msg)[0]
+        if len(coin_appearance) != 0:
+            msg_fr_r = msg_fr_r = '__{}__\n'.format(tf_converter[time_frame])
+            for r in full_results:
+                if r['coin'] == coin:
+                    result = '**{}** | {} | Score: {} | Divergence {} to {} periods ago\n'.format(r['coin'],r['type div'],r['score'],r['position'][1],r['position'][0])
+                    msg_fr_r = msg_fr_r + result
+
         #find occurrences in current_div_results
         coins_cd = [adict['coin'] for adict in current_div_results]
         if coin in coins_cd:
             msg_cd = msg_cd + '{}: :white_check_mark:\n'.format(time_frame)
         else:
             msg_cd = msg_cd + '{}: :x:\n'.format(time_frame)
-        msg_cd_r = msg_cd_r + '__{}__\n'.format(tf_converter[time_frame])
-        for r in current_div_results:
-            if r['coin'] == coin:
-                result = '**{}** | Score: {} | Void Price: {} | Current Price: {}\n'.format(r['coin'],r['score'],r['void price'],r['current price'])
-                msg_cd_r = msg_cd_r + result
+        #Format message for $tripdiv
         coin_appearance = [c for c in current_div_results if coin == c['coin']]
-        if len(coin_appearance) == 0:
-            strip_msg = '__{}__\n'.format(tf_converter[time_frame])
-            msg_cd_r = msg_cd_r.split(strip_msg)[0]
+        if len(coin_appearance) != 0:
+            msg_cd_r = msg_cd_r + '__{}__\n'.format(tf_converter[time_frame])
+            for r in current_div_results:
+                if r['coin'] == coin:
+                    result = '**{}** | Score: {} | Void Price: {} | Current Price: {}\n'.format(r['coin'],r['score'],r['void price'],r['current price'])
+                    msg_cd_r = msg_cd_r + result
+
         #find occurrences in triple div
         trip_divs = find_tripdivs(full_results)
         if coin in trip_divs:
             msg_t = msg_t + '{}: :white_check_mark:\n'.format(time_frame)
         else:
             msg_t = msg_t + '{}: :x:\n'.format(time_frame)
+
     return msg_fr,msg_cd,msg_t,msg_fr_r,msg_cd_r
 
 def cs_msg_overflow_reformat(msg):
