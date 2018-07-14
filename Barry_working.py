@@ -52,7 +52,7 @@ async def histdiv(ctx,time_frame:str):
     valid_time_frames = ['1hour','2hour','4hour','6hour','8hour','12hour','1day']
     if time_frame not in valid_time_frames:
         await bot.say('Not a valid timeframe to analyze for')
-        await bot.say('Valid Time Frames are: {}'.format(valid_time_frames))
+        await bot.say('Valid Time Frames: {}'.format(valid_time_frames))
     else:
         #Retrieve results from background task
         tf_to_period = {'1hour':'1h','2hour':'2h','4hour':'4h','6hour':'6h','8hour':'8h','12hour':'12h','1day':'1d'}
@@ -69,7 +69,7 @@ async def histdiv(ctx,time_frame:str):
             message = full_results_str_list[idx][0]
             embed = discord.Embed(title=embed_title,description=message)
             await bot.say(embed=embed)
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.5)
 
 @bot.command(pass_context=True)
 async def currentdiv(ctx,time_frame:str):
@@ -93,7 +93,7 @@ async def currentdiv(ctx,time_frame:str):
             message = cdr_str_list[idx][0]
             embed = discord.Embed(title=embed_title,description=message)
             await bot.say(embed=embed)
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.5)
 
 @bot.command(pass_context=True)
 async def tripdiv(ctx,time_frame:str):
@@ -117,12 +117,12 @@ async def tripdiv(ctx,time_frame:str):
 
 @bot.command(pass_context=True)
 async def helpme(ctx):
-    embed = discord.Embed(title='Help Guide',description='A quick overview of the bot')
+    embed = discord.Embed(title='Help Guide',description='*A quick overview of the bot*')
     embed.set_author(name='Triple Divergence Indicator (RSI/OBV/MACD)')
-    embed.add_field(name='Valid Time Frames (written how is):',value='1hour, 2hour, 4hour, 6hour, 8hour, 12hour, 1day')
     embed.add_field(name='Commands:',value='$helpme \n$histdiv (time frame) \n$currentdiv (time frame) \n$tripdiv (time frame) \n$howmany \n$coinsearch (COINPAIRING)')
+    embed.add_field(name='Valid Time Frames (written how is):',value='1hour, 2hour, 4hour, 6hour, 8hour, 12hour, 1day')
     embed.add_field(name='Calculates/Finds?',value='RSI, OBV, and MACD Divergences (within 28 periods) and possible forming RSI Divergences')
-    embed.add_field(name='Feedback?',value='Add me on Discord: rpp#9779')
+    embed.add_field(name='Feedback, Changes, or Input?',value='Add me on Discord: rpp#9779')
     await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
@@ -712,7 +712,7 @@ def current_div_results_to_str(current_div_results):
     #Formats result and adds to a temp_list which is used to not exceed char limit
     for idx in range(len(current_div_results)):
         dct = current_div_results[idx]
-        result = '**{}** | Score: {} | Void Price: {} | Current Price: {}\n'.format(dct['coin'],dct['score'],dct['void price'],dct['current price'])
+        result = '**{}** | Score: {} | Void Sats: {} | Current Sats: {}\n'.format(dct['coin'],dct['score'],dct['void price'],dct['current price'])
         result_message = result_message + result
         #organizes into groups of 15 to not exceed Character Limit 1024
         if (idx + 1) % 15 == 0 or idx == (len(current_div_results) - 1):
@@ -867,9 +867,8 @@ def coinsearch_message(coin,results_dict):
             msg_fr_r = msg_fr_r + '__{}__\n'.format(tf_converter[time_frame])
             for r in full_results:
                 if r['coin'] == coin:
-                    result = '**{}** | {} | Score: {} | Divergence {} to {} periods ago\n'.format(r['coin'],r['type div'],r['score'],r['position'][1],r['position'][0])
+                    result = '{} | Score: {} | Divergence {} to {} periods ago\n'.format(r['coin'],r['type div'],r['score'],r['position'][1],r['position'][0])
                     msg_fr_r = msg_fr_r + result
-                    print(msg_fr_r)
 
         #find occurrences in current_div_results
         coins_cd = [adict['coin'] for adict in current_div_results]
@@ -883,7 +882,7 @@ def coinsearch_message(coin,results_dict):
             msg_cd_r = msg_cd_r + '__{}__\n'.format(tf_converter[time_frame])
             for r in current_div_results:
                 if r['coin'] == coin:
-                    result = '**{}** | Score: {} | Void Price: {} | Current Price: {}\n'.format(r['coin'],r['score'],r['void price'],r['current price'])
+                    result = 'Score: {} | Void Price: {} | Current Price: {}\n'.format(r['coin'],r['score'],r['void price'],r['current price'])
                     msg_cd_r = msg_cd_r + result
 
         #find occurrences in triple div
