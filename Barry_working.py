@@ -65,7 +65,7 @@ async def histdiv(ctx,time_frame:str):
         tf_converter_print = {'1hour':'1 hour','2hour':'2 hour','4hour':'4 hour','6hour':'6 hour','8hour':'8 hour','12hour':'12 hour','1day':'1 day'}
         #Print embed statements to Discord
         for idx in range(len(full_results_str_list)):
-            embed_title = 'Historical Divergences within 28 periods for {} Candles: Part {} of {}'.format(tf_converter_print[time_frame],idx + 1,len(full_results_str_list))
+            embed_title = '**Historical Divergences within 28 periods for {} Candles:** Part {} of {}'.format(tf_converter_print[time_frame],idx + 1,len(full_results_str_list))
             message = full_results_str_list[idx][0]
             embed = discord.Embed(title=embed_title,description=message)
             await bot.say(embed=embed)
@@ -89,7 +89,7 @@ async def currentdiv(ctx,time_frame:str):
         tf_converter_print = {'1hour':'1 hour','2hour':'2 hour','4hour':'4 hour','6hour':'6 hour','8hour':'8 hour','12hour':'12 hour','1day':'1 day'}
         #Print embed statements to Discord
         for idx in range(len(cdr_str_list)):
-            embed_title = 'Current Possible RSI Divergences (Part {} of {})'.format(idx + 1,len(cdr_str_list))
+            embed_title = '**Current Possible RSI Divergences:** Part {} of {}'.format(idx + 1,len(cdr_str_list))
             message = cdr_str_list[idx][0]
             embed = discord.Embed(title=embed_title,description=message)
             await bot.say(embed=embed)
@@ -109,7 +109,7 @@ async def tripdiv(ctx,time_frame:str):
         #Find triple divergences
         trip_divs = find_tripdivs(results_desired_fr)
         #Format embed message for tripdivs
-        tf_converter_print = {'1hour':'1 hour','2hour':'2 hour','4hour':'4 hour','6hour':'6 hour','8hour':'8 hour','12hour':'12 hour','1day':'1 day'}
+        tf_converter_print = {'1hour':'1 Hour','2hour':'2 Hour','4hour':'4 Hour','6hour':'6 Hour','8hour':'8 Hour','12hour':'12 Hour','1day':'1 Day'}
         message = tripdivs_message(trip_divs)
         embed_title = 'Historical Triple Divergence(s) for {} Candles'.format(tf_converter_print[time_frame])
         embed = discord.Embed(title=embed_title,description=message)
@@ -118,7 +118,7 @@ async def tripdiv(ctx,time_frame:str):
 @bot.command(pass_context=True)
 async def helpme(ctx):
     embed = discord.Embed(title='Help Guide',description='*A quick overview of the bot*')
-    embed.set_author(name='Triple Divergence Indicator (RSI/OBV/MACD)')
+    embed.set_author(name='**Triple Divergence Indicator (RSI/OBV/MACD)**')
     embed.add_field(name='Commands:',value='$helpme \n$histdiv (time frame) \n$currentdiv (time frame) \n$tripdiv (time frame) \n$howmany \n$coinsearch (COINPAIRING)')
     embed.add_field(name='Valid Time Frames (written how is):',value='1hour, 2hour, 4hour, 6hour, 8hour, 12hour, 1day')
     embed.add_field(name='Calculates/Finds?',value='RSI, OBV, and MACD Divergences (within 28 periods) and possible forming RSI Divergences')
@@ -143,10 +143,10 @@ async def howmany(ctx):
         t_divs.append(len(trip_divs))
     #Form message for embed
     fr_msg, cd_msg, t_msg = howmany_message(fr_divs,cd_divs,t_divs)
-    embed = discord.Embed(title='Number of Divergence for all Analyses',description='*Analyses = Historical, Current, Triple*')
-    embed.add_field(name='$histdiv',value=fr_msg)
-    embed.add_field(name='$currentdiv',value=cd_msg)
-    embed.add_field(name='$tripdiv',value=t_msg)
+    embed = discord.Embed(title='**Number of Divergence for All Analyses**',description='*Analyses = Historical, Current, Triple*')
+    embed.add_field(name='__$histdiv__',value=fr_msg)
+    embed.add_field(name='__$currentdiv__',value=cd_msg)
+    embed.add_field(name='__$tripdiv__',value=t_msg)
     await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
@@ -157,7 +157,7 @@ async def coinsearch(ctx,coin:str):
     else:
         results_dict = bot.results_dict
         msg_fr, msg_cd, msg_t, msg_fr_r, msg_cd_r = coinsearch_message(coin,results_dict)
-        embed = discord.Embed(title='Overview Search Results for {}'.format(coin),description='Searched in $histdiv, $currentdiv, $tripdiv')
+        embed = discord.Embed(title='**Overview Search Results for {}**'.format(coin),description='*Searched in $histdiv, $currentdiv, $tripdiv*')
         embed.add_field(name='$histdiv',value=msg_fr)
         embed.add_field(name='$currentdiv',value=msg_cd)
         embed.add_field(name='$tripdiv',value=msg_t)
@@ -795,9 +795,9 @@ def tripdivs_message(trip_divs):
     for idx in range(len(trip_divs)):
         coin = trip_divs[idx]
         if (idx + 1) % 7 == 0 or idx == (len(trip_divs) - 1):
-            message = message + '{} \n'.format(coin)
+            message = message + '{}{}\n'.format(coin,(9 - len(coin)) * ' ')
         else:
-            message = message + '{} '.format(coin)
+            message = message + '{}{}'.format(coin,(9 - len(coin)) * ' ')
     if len(message) == 0:
         message = 'None'
     return message 
@@ -811,7 +811,7 @@ def howmany_message(fr_divs,cd_divs,t_divs):
     Returns:
         message;str
     '''
-    periods = ['1 hour', '2hour', '4hour', '6 hour', '8 hour', '12 hour', '1 day']
+    periods = ['1 hour', '2 hour', '4 hour', '6 hour', '8 hour', '12 hour', '1 day']
     fr_msg = ''
     for idx in range(len(fr_divs)):
         new_msg = '{}: {} divergences \n'.format(periods[idx], fr_divs[idx])
@@ -844,7 +844,7 @@ def coinsearch_message(coin,results_dict):
     Returns:
         cs_msg;str
     '''
-    periods = ['1 hour', '2hour', '4hour', '6 hour', '8 hour', '12 hour', '1 day']
+    periods = ['1 hour', '2 hour', '4 hour', '6 hour', '8 hour', '12 hour', '1 day']
     time_frames = ['1h','2h','4h','6h','8h','12h','1d']
     tf_converter = {'1h':'1 Hour:','2h':'2 Hour:','4h':'4 Hour:','6h':'6 Hour:','8h':'8 Hour:','12h':'12 Hour:','1d':'1 Day:'}
     msg_fr = ''
@@ -867,7 +867,7 @@ def coinsearch_message(coin,results_dict):
             msg_fr_r = msg_fr_r + '__{}__\n'.format(tf_converter[time_frame])
             for r in full_results:
                 if r['coin'] == coin:
-                    result = '{} | Score: {} | Divergence {} to {} periods ago\n'.format(r['coin'],r['type div'],r['score'],r['position'][1],r['position'][0])
+                    result = '{} | Score: {} | Divergence {} to {} periods ago\n'.format(r['type div'],r['score'],r['position'][1],r['position'][0])
                     msg_fr_r = msg_fr_r + result
 
         #find occurrences in current_div_results
@@ -882,7 +882,7 @@ def coinsearch_message(coin,results_dict):
             msg_cd_r = msg_cd_r + '__{}__\n'.format(tf_converter[time_frame])
             for r in current_div_results:
                 if r['coin'] == coin:
-                    result = 'Score: {} | Void Price: {} | Current Price: {}\n'.format(r['coin'],r['score'],r['void price'],r['current price'])
+                    result = 'Score: {} | Void Price: {} | Current Price: {}\n'.format(r['score'],r['void price'],r['current price'])
                     msg_cd_r = msg_cd_r + result
 
         #find occurrences in triple div
