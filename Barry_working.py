@@ -156,12 +156,14 @@ async def coinsearch(ctx,coin:str):
         await bot.say('**Not a valid coin** \n__Common Problems__: \nCoin pairing not uppercase \nCoin pairing does not have enough data to be run for results (will be added in the future) \nMispelling')
     else:
         results_dict = bot.results_dict
-        msg_fr, msg_cd, msg_t = coinsearch_message(coin,results_dict)
-        embed = discord.Embed(title='Search Results for {}'.format(coin),description='Searched in $histdiv, $currentdiv, $tripdiv')
+        msg_fr, msg_cd, msg_t, msg_fr_r, msg_cd_r = coinsearch_message(coin,results_dict)
+        embed = discord.Embed(title='Overview Search Results for {}'.format(coin),description='Searched in $histdiv, $currentdiv, $tripdiv')
         embed.add_field(name='$histdiv',value=msg_fr)
         embed.add_field(name='$currentdiv',value=msg_cd)
         embed.add_field(name='$tripdiv',value=msg_t)
         await bot.say(embed=embed)
+        cs_r = ''.format()
+        embed = discord.Embed(title='Search Results for {}'.format(coin),description='*Results from $histdiv and $currentdiv')
 
             
 
@@ -845,9 +847,12 @@ def coinsearch_message(coin,results_dict):
     '''
     periods = ['1 hour', '2hour', '4hour', '6 hour', '8 hour', '12 hour', '1 day']
     time_frames = ['1h','2h','4h','6h','8h','12h','1d']
+    tf_converter = {'1h':'1 Hour:','2h':'2 Hour:','4h':'4 Hour:','6h':'6 Hour:','8h':'8 Hour:','12h':'12 Hour:','1d':'1 Day:'}
     msg_fr = ''
     msg_cd = ''
     msg_t = ''
+    msg_fr_r = ''
+    msg_cd_r = ''
     for time_frame in time_frames:
         full_results, current_div_results = results_dict[time_frame]
         full_results = divs_filter(full_results)
@@ -857,19 +862,35 @@ def coinsearch_message(coin,results_dict):
             msg_fr = msg_fr + '{}: :white_check_mark:\n'.format(time_frame)
         else:
             msg_fr = msg_fr + '{}: :x:\n'.format(time_frame)
+        msg_fr_r = msg_fr_r = '__{}__\n'.format(tf_converter[time_frame])
+        for r in full_results:
+            if r['coin'] == coin:
+                result = '**{}** | {} | Score: {} | Divergence {} to {} periods ago\n'.format(r['coin'],r['type div'],r['score'],r['position'][1],r['position'][0])
+                msg_fr_r = msg_fr_r + result
+        if len(full_results) == 0:
+            strip_msg = '__{}__\n'.format(tf_converter[time_frame])
+            msg_fr_r = msg_fr_r.split(strip_msg)[0]
         #find occurrences in current_div_results
         coins_cd = [adict['coin'] for adict in current_div_results]
         if coin in coins_cd:
             msg_cd = msg_cd + '{}: :white_check_mark:\n'.format(time_frame)
         else:
             msg_cd = msg_cd + '{}: :x:\n'.format(time_frame)
+        msg_cd_r = msg_cd_r + '__{}__\n'.format(tf_converter[time_frame])
+        for r in current_div_results:
+            if r['coin'] == coin:
+                result = '**{}** | Score: {} | Void Price: {} | Current Price: {}\n'.format(r['coin'],r['score'],r['void price'],r['current price'])
+                msg_cd_r = msg_cd_r + result
+        if len(current_div_results) == 0:
+            strip_msg = '__{}__\n'.format(tf_converter[time_frame])
+            msg_cd_r = msg_cd_r.split(strip_msg)[0]
         #find occurrences in triple div
         trip_divs = find_tripdivs(full_results)
         if coin in trip_divs:
             msg_t = msg_t + '{}: :white_check_mark:\n'.format(time_frame)
         else:
             msg_t = msg_t + '{}: :x:\n'.format(time_frame)
-    return msg_fr,msg_cd,msg_t
+    return msg_fr,msg_cd,msg_t,msg_fr_r,msg_cd_r
 
 
 my_token = os.environ.get('TOKEN')
