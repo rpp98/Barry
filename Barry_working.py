@@ -65,7 +65,7 @@ async def histdiv(ctx,time_frame:str):
         tf_converter_print = {'1hour':'1 hour','2hour':'2 hour','4hour':'4 hour','6hour':'6 hour','8hour':'8 hour','12hour':'12 hour','1day':'1 day'}
         #Print embed statements to Discord
         for idx in range(len(full_results_str_list)):
-            embed_title = '**Historical Divergences within 28 periods for {} Candles:** Part {} of {}'.format(tf_converter_print[time_frame],idx + 1,len(full_results_str_list))
+            embed_title = 'Historical Divergences within 28 periods for {} Candles: Part {} of {}'.format(tf_converter_print[time_frame],idx + 1,len(full_results_str_list))
             message = full_results_str_list[idx][0]
             embed = discord.Embed(title=embed_title,description=message)
             await bot.say(embed=embed)
@@ -118,7 +118,7 @@ async def tripdiv(ctx,time_frame:str):
 @bot.command(pass_context=True)
 async def helpme(ctx):
     embed = discord.Embed(title='Help Guide',description='*A quick overview of the bot*')
-    embed.set_author(name='**Triple Divergence Indicator (RSI/OBV/MACD)**')
+    embed.set_author(name='Triple Divergence Indicator (RSI/OBV/MACD)')
     embed.add_field(name='Commands:',value='$helpme \n$histdiv (time frame) \n$currentdiv (time frame) \n$tripdiv (time frame) \n$howmany \n$coinsearch (COINPAIRING)')
     embed.add_field(name='Valid Time Frames (written how is):',value='1hour, 2hour, 4hour, 6hour, 8hour, 12hour, 1day')
     embed.add_field(name='Calculates/Finds?',value='RSI, OBV, and MACD Divergences (within 28 periods) and possible forming RSI Divergences')
