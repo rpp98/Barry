@@ -163,7 +163,7 @@ async def coinsearch(ctx,coin:str):
         embed.add_field(name='$tripdiv',value=msg_t)
         await bot.say(embed=embed)
         await asyncio.sleep(0.1)
-        embed = discord.Embed(title='Search Results for {}'.format(coin),description='*Results from $histdiv and $currentdiv')
+        embed = discord.Embed(title='Search Results for {}'.format(coin),description='*Results from $histdiv and $currentdiv*')
         embed.add_field(name='$histdiv',value=msg_fr_r)
         embed.add_field(name='$currentdiv',value=msg_cd_r)
         await bot.say(embed=embed)
@@ -869,7 +869,8 @@ def coinsearch_message(coin,results_dict):
             if r['coin'] == coin:
                 result = '**{}** | {} | Score: {} | Divergence {} to {} periods ago\n'.format(r['coin'],r['type div'],r['score'],r['position'][1],r['position'][0])
                 msg_fr_r = msg_fr_r + result
-        if len(full_results) == 0:
+        coin_appearance = [c for c in full_results if coin == c['coin']]
+        if len(coin_appearance) == 0:
             strip_msg = '__{}__\n'.format(tf_converter[time_frame])
             msg_fr_r = msg_fr_r.split(strip_msg)[0]
         #find occurrences in current_div_results
@@ -883,7 +884,8 @@ def coinsearch_message(coin,results_dict):
             if r['coin'] == coin:
                 result = '**{}** | Score: {} | Void Price: {} | Current Price: {}\n'.format(r['coin'],r['score'],r['void price'],r['current price'])
                 msg_cd_r = msg_cd_r + result
-        if len(current_div_results) == 0:
+        coin_appearance = [c for c in current_div_results if coin == c['coin']]
+        if len(coin_appearance) == 0:
             strip_msg = '__{}__\n'.format(tf_converter[time_frame])
             msg_cd_r = msg_cd_r.split(strip_msg)[0]
         #find occurrences in triple div
