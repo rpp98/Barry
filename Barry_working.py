@@ -864,11 +864,12 @@ def coinsearch_message(coin,results_dict):
         #Format message for $tripdiv
         coin_appearance = [c for c in full_results if coin == c['coin']]
         if len(coin_appearance) != 0:
-            msg_fr_r = msg_fr_r = '__{}__\n'.format(tf_converter[time_frame])
+            msg_fr_r = msg_fr_r + '__{}__\n'.format(tf_converter[time_frame])
             for r in full_results:
                 if r['coin'] == coin:
                     result = '**{}** | {} | Score: {} | Divergence {} to {} periods ago\n'.format(r['coin'],r['type div'],r['score'],r['position'][1],r['position'][0])
                     msg_fr_r = msg_fr_r + result
+                    print(msg_fr_r)
 
         #find occurrences in current_div_results
         coins_cd = [adict['coin'] for adict in current_div_results]
@@ -891,6 +892,11 @@ def coinsearch_message(coin,results_dict):
             msg_t = msg_t + '{}: :white_check_mark:\n'.format(time_frame)
         else:
             msg_t = msg_t + '{}: :x:\n'.format(time_frame)
+    #In case of nul results
+    if len(msg_fr_r) == 0:
+        msg_fr_r = 'None\n'
+    if len(msg_cd_r) == 0:
+        msg_cd_r = 'None\n'
 
     return msg_fr,msg_cd,msg_t,msg_fr_r,msg_cd_r
 
