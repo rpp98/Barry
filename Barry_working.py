@@ -163,14 +163,10 @@ async def coinsearch(ctx,coin:str):
         embed.add_field(name='$tripdiv',value=msg_t)
         await bot.say(embed=embed)
         await asyncio.sleep(0.1)
-        embed = discord.Embed(title='Search Results for {}'.format(coin),description='*Results from $histdiv and $currentdiv*')
-        embed.add_field(name='$histdiv',value=msg_fr_r)
-        embed.add_field(name='$currentdiv',value=msg_cd_r)
+        cr_msg = '**$histdiv:**\n{}\n**$currentdiv:**\n{}'.format(msg_fr_r,msg_cd_r)
+        embed = discord.Embed(title='Search Results for {}'.format(coin),description=cr_msg)
         await bot.say(embed=embed)
             
-
-
-
 async def get_candles(coin,limitK,period):
     """Uses aiohttp to download data from Binance based on coin, period, and limit
     Parameters:
@@ -896,6 +892,16 @@ def coinsearch_message(coin,results_dict):
             msg_t = msg_t + '{}: :x:\n'.format(time_frame)
     return msg_fr,msg_cd,msg_t,msg_fr_r,msg_cd_r
 
+def cs_msg_overflow_reformat(msg)
+    '''Reformat msg to prevent exceeding Discord's character limit in Embeds (2000 for normal; 1024 in fields)
+    Parameters:
+        msg;string
+    Returns:
+        msg;str
+    '''
+    if len(msg) > 1900:
+        print('xd')
+    return msg
 
 my_token = os.environ.get('TOKEN')
 bot.run(my_token)
