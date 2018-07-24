@@ -32,6 +32,7 @@ async def background_running_analysis():
         time_periods1 = ['2h']
         time_periods = ['1h','2h','4h','6h','8h','12h','1d']
         for period in time_periods:
+            bot.results_dict = results_dict
             results_fr = []
             results_current_div = []
             for coin in coin_list:
