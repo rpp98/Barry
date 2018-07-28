@@ -176,8 +176,10 @@ async def recent(ctx):
     msg_dict = recent_message(filtered_results)
     #Create embed
     embed = discord.Embed(title='Recent Divergences for All Time Frames',description='')
-    for k,v in msg_dict:
-        embed.add_field(name=k,value=v)
+    for d in msg_dict:
+        for key in d:
+            value = d[key]
+            embed.add_field(name=key,value=value)
     await bot.say(embed=embed)
 
 async def get_candles(coin,limitK,period):
