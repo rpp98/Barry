@@ -141,9 +141,7 @@ async def howmany(ctx):
         fr_divs.append(len(full_results))
         cd_divs.append(len(current_div_results))
         trip_divs = find_tripdivs(full_results)
-        print(trip_divs, len(trip_divs))
         t_divs.append(len(trip_divs))
-        print(t_divs)
     #Form message for embed
     fr_msg, cd_msg, t_msg = howmany_message(fr_divs,cd_divs,t_divs)
     embed = discord.Embed(title='**Number of Divergence for All Analyses**',description='*Analyses = Historical, Current, Triple*')
@@ -784,7 +782,8 @@ def find_tripdivs(full_results):
             if r['position'][0] == o['position'][0] and r['position'][1] == o['position'][1]:
                 for m in list_divs_MACD:
                     if r['position'][0] == m['position'][0] and r['position'][1] == m['position'][1]:
-                        trip_divs.append(r['coin'])
+                        if r['coin'] not in trip_divs:
+                            trip_divs.append(r['coin'])
     return trip_divs
 
 def tripdivs_message(trip_divs):
