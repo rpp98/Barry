@@ -590,7 +590,7 @@ def comparator_results_compiler(coin,trend_RSI,trend_OBV,trend_MACD,score_RSI,sc
     """
     if trend_RSI == True:
         for idx in range(len(score_RSI)):
-            full_results.append({'coin':coin,'type div':'RSI Divergence','score':score_RSI[idx],'position':[rsi_div_idx[idx * 2],rsi_div_idx[(idx * 2) + 1]]})
+            full_results.append({'coin':coin,'type div':'RSI Divergence','score':score_RSI[idx],'position':[rsi_div_idx[idx * 2] - 1,rsi_div_idx[(idx * 2) + 1] - 1]})
     if trend_OBV == True:
         for idx in range(len(score_OBV)):
             full_results.append({'coin':coin,'type div':'OBV Divergence','score':score_OBV[idx],'position':[obv_div_idx[idx * 2],obv_div_idx[(idx * 2) + 1]]})
@@ -796,10 +796,11 @@ def tripdivs_message(trip_divs):
     message = ''
     for idx in range(len(trip_divs)):
         coin = trip_divs[idx]
-        if (idx + 1) % 7 == 0 or idx == (len(trip_divs) - 1):
-            message = message + '{}{}\n'.format(coin,(9 - len(coin)) * ' ')
-        else:
-            message = message + '{}{}'.format(coin,(9 - len(coin)) * ' ')
+        if coin not in message:
+            if (idx + 1) % 7 == 0 or idx == (len(trip_divs) - 1):
+                message = message + '{}{}\n'.format(coin,(9 - len(coin)) * ' ')
+            else:
+                message = message + '{}{}'.format(coin,(9 - len(coin)) * ' ')
     if len(message) == 0:
         message = 'None'
     return message 
