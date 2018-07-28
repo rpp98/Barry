@@ -776,7 +776,7 @@ def find_tripdivs(full_results):
     '''
     list_divs_RSI = [r for r in full_results if r['type div'] == 'RSI Divergence']
     list_divs_OBV = [r for r in full_results if r['type div'] == 'OBV Divergence']
-    list_divs_MACD = [r for r in full_results if r['type div '] == 'MACD Divergence']
+    list_divs_MACD = [r for r in full_results if r['type div'] == 'MACD Divergence']
     trip_divs = []
     for r in list_divs_RSI:
         for o in list_divs_OBV:
