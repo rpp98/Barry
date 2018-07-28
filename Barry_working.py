@@ -131,7 +131,6 @@ async def helpme(ctx):
 async def howmany(ctx):
     results_dict = bot.results_dict
     time_frames = ['1h','2h','4h','6h','8h','12h','1d']
-    tf_to_period = {'1hour':'1h','2hour':'2h','4hour':'4h','6hour':'6h','8hour':'8h','12hour':'12h','1day':'1d'}
     fr_divs = []
     cd_divs = []
     t_divs  = []
@@ -142,7 +141,7 @@ async def howmany(ctx):
         fr_divs.append(len(full_results))
         cd_divs.append(len(current_div_results))
         trip_divs = find_tripdivs(full_results)
-        t_divs.append(len(trip_divs))
+        t_divs.append(len(trip_divs) // 7)
     #Form message for embed
     fr_msg, cd_msg, t_msg = howmany_message(fr_divs,cd_divs,t_divs)
     embed = discord.Embed(title='**Number of Divergence for All Analyses**',description='*Analyses = Historical, Current, Triple*')
@@ -810,7 +809,7 @@ def howmany_message(fr_divs,cd_divs,t_divs):
     Parameters:
         fr_divs;list of ints
         cd_divs;list of ints
-        t_divs;list of ints
+        t_divs;
     Returns:
         message;str
     '''
@@ -945,6 +944,8 @@ def recent_message(results):
         if len(r) != 0:
             #Add Title
             msg = msg + '__{}__\n'.format(tf_converter[r[0]['period']])
+            #Sort r based on score
+            r = sorted(r, key=lambda r: float(r['score']),reverse=True)
             for rr in r:
                 new_msg = '{} | {} | Score: {} | Divergence {} to {} periods ago\n'.format(rr['coin'], rr['type div'], rr['score'], rr['position'][1], rr['position'][0])
                 msg = msg + new_msg
