@@ -141,7 +141,9 @@ async def howmany(ctx):
         fr_divs.append(len(full_results))
         cd_divs.append(len(current_div_results))
         trip_divs = find_tripdivs(full_results)
-        t_divs.append(len(trip_divs) // 7)
+        print(trip_divs, len(trip_divs))
+        t_divs.append(len(trip_divs))
+        print(t_divs)
     #Form message for embed
     fr_msg, cd_msg, t_msg = howmany_message(fr_divs,cd_divs,t_divs)
     embed = discord.Embed(title='**Number of Divergence for All Analyses**',description='*Analyses = Historical, Current, Triple*')
@@ -809,7 +811,7 @@ def howmany_message(fr_divs,cd_divs,t_divs):
     Parameters:
         fr_divs;list of ints
         cd_divs;list of ints
-        t_divs;
+        t_divs;list of ints
     Returns:
         message;str
     '''
