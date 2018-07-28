@@ -27,12 +27,11 @@ async def background_running_analysis():
         #coin_failures are to keep track of which coins dont work (aka not enough data)
         coin_failures = coin_list = ['DENTBTC', 'MFTBTC', 'KEYBTC', 'NASBTC', 'NPXSBTC', 'VENUSDT', 'DATABTC', 'NXSBTC', 'SCBTC', 'ETCUSDT', 'ICXUSDT', 'ONTUSDT', 'TRXUSDT', 'AGIBTC', 'BCNBTC', 'GNTBTC', 'IOTXBTC', 'LOOMBTC', 'QKCBTC', 'REPBTC', 'SKYBTC', 'THETABTC', 'TUSDBTC', 'ZENBTC', 'EOSUSDT', 'IOTAUSDT', 'TUSDUSDT', 'XLMUSDT', 'XRPUSDT']
         coin_list1 = ['NAVBTC'] #pour testing
-        coin_list = ['ADABTC', 'ADXBTC', 'AEBTC', 'AIONBTC', 'AMBBTC', 'APPCBTC', 'ARKBTC', 'ARNBTC', 'ASTBTC', 'BATBTC', 'BCCBTC', 'BCDBTC', 'BCPTBTC', 'BLZBTC', 'BNBBTC', 'BNTBTC', 'BQXBTC', 'BRDBTC', 'BTGBTC', 'BTSBTC', 'CDTBTC', 'CHATBTC', 'CLOAKBTC', 'CMTBTC', 'CNDBTC', 'DASHBTC', 'DGDBTC', 'DLTBTC', 'DNTBTC', 'EDOBTC', 'ELFBTC', 'ENGBTC', 'ENJBTC', 'EOSBTC', 'ETCBTC', 'ETHBTC', 'EVXBTC', 'FUELBTC', 'FUNBTC', 'GASBTC', 'GRSBTC', 'GTOBTC', 'GVTBTC', 'GXSBTC', 'HSRBTC', 'ICNBTC', 'ICXBTC', 'INSBTC', 'IOSTBTC', 'IOTABTC', 'KMDBTC', 'KNCBTC', 'LENDBTC', 'LINKBTC', 'LRCBTC', 'LSKBTC', 'LTCBTC', 'LUNBTC', 'MANABTC', 'MCOBTC', 'MDABTC', 'MODBTC', 'MTHBTC', 'MTLBTC', 'NANOBTC', 'NAVBTC', 'NCASHBTC', 'NEBLBTC', 'NEOBTC', 'NULSBTC', 'OAXBTC', 'OMGBTC', 'ONTBTC', 'OSTBTC', 'PIVXBTC', 'POABTC', 'POEBTC', 'POWRBTC', 'PPTBTC', 'QLCBTC', 'QSPBTC', 'QTUMBTC', 'RCNBTC', 'RDNBTC', 'REQBTC', 'RLCBTC', 'RPXBTC', 'SALTBTC', 'SNMBTC', 'SNTBTC', 'SNGLSBTC', 'STEEMBTC', 'STORJBTC', 'STRATBTC', 'SUBBTC', 'SYSBTC', 'TNBBTC','TNTBTC', 'TRIGBTC', 'TRXBTC', 'VENBTC', 'VIABTC', 'VIBBTC', 'VIBEBTC', 'WABIBTC', 'WANBTC', 'WAVESBTC', 'WINGSBTC', 'WPRBTC', 'WTCBTC', 'XEMBTC', 'XLMBTC', 'XMRBTC', 'XVGBTC', 'XRPBTC', 'XZCBTC', 'YOYOBTC', 'ZECBTC', 'ZILBTC', 'ZRXBTC', 'ADAUSDT', 'BCCUSDT', 'BNBUSDT', 'BTCUSDT', 'ETHUSDT', 'LTCUSDT', 'NEOUSDT', 'QTUMUSDT']
+        coin_list = ['ADABTC', 'ADXBTC', 'AEBTC', 'AIONBTC', 'AMBBTC', 'APPCBTC', 'ARKBTC', 'ARNBTC', 'ASTBTC', 'BATBTC', 'BCCBTC', 'BCDBTC', 'BCPTBTC', 'BLZBTC', 'BNBBTC', 'BNTBTC', 'BQXBTC', 'BRDBTC', 'BTGBTC', 'BTSBTC', 'CDTBTC', 'CHATBTC', 'CLOAKBTC', 'CMTBTC', 'CNDBTC', 'DASHBTC', 'DGDBTC', 'DLTBTC', 'DNTBTC', 'EDOBTC', 'ELFBTC', 'ENGBTC', 'ENJBTC', 'EOSBTC', 'ETCBTC', 'ETHBTC', 'EVXBTC', 'FUELBTC', 'FUNBTC', 'GASBTC', 'GRSBTC', 'GTOBTC', 'GVTBTC', 'GXSBTC', 'HSRBTC', 'ICNBTC', 'ICXBTC', 'INSBTC', 'IOSTBTC', 'IOTABTC', 'KMDBTC', 'KNCBTC', 'LENDBTC', 'LINKBTC', 'LRCBTC', 'LSKBTC', 'LTCBTC', 'LUNBTC', 'MANABTC', 'MCOBTC', 'MDABTC', 'MODBTC', 'MTHBTC', 'MTLBTC', 'NANOBTC', 'NAVBTC', 'NCASHBTC', 'NEBLBTC', 'NEOBTC', 'NULSBTC', 'OAXBTC', 'OMGBTC', 'ONTBTC', 'OSTBTC', 'PIVXBTC', 'POABTC', 'POEBTC', 'POWRBTC', 'PPTBTC', 'QLCBTC', 'QSPBTC', 'QTUMBTC', 'RCNBTC', 'RDNBTC', 'REQBTC', 'RLCBTC', 'RPXBTC', 'SALTBTC', 'SNMBTC', 'SNTBTC', 'SNGLSBTC', 'STEEMBTC', 'STORJBTC', 'STRATBTC', 'SUBBTC', 'SYSBTC', 'TNBBTC', 'TNTBTC', 'TRIGBTC', 'TRXBTC', 'VIABTC', 'VIBBTC', 'VIBEBTC', 'WABIBTC', 'WANBTC', 'WAVESBTC', 'WINGSBTC', 'WPRBTC', 'WTCBTC', 'XEMBTC', 'XLMBTC', 'XMRBTC', 'XVGBTC', 'XRPBTC', 'XZCBTC', 'YOYOBTC', 'ZECBTC', 'ZILBTC', 'ZRXBTC', 'ADAUSDT', 'BCCUSDT', 'BNBUSDT', 'BTCUSDT', 'ETHUSDT', 'LTCUSDT', 'NEOUSDT', 'QTUMUSDT']
         #Calculate for all time periods 
         time_periods1 = ['2h']
         time_periods = ['1h','2h','4h','6h','8h','12h','1d']
         for period in time_periods:
-            bot.results_dict = results_dict
             results_fr = []
             results_current_div = []
             for coin in coin_list:
@@ -122,7 +121,7 @@ async def tripdiv(ctx,time_frame:str):
 async def helpme(ctx):
     embed = discord.Embed(title='Help Guide',description='*A quick overview of the bot*')
     embed.set_author(name='Triple Divergence Indicator (RSI/OBV/MACD)')
-    embed.add_field(name='Commands:',value='$helpme \n$histdiv (time frame) \n$currentdiv (time frame) \n$tripdiv (time frame) \n$howmany \n$coinsearch (COINPAIRING)')
+    embed.add_field(name='Commands:',value='$helpme \n$histdiv (time frame) \n$currentdiv (time frame) \n$tripdiv (time frame) \n$howmany \n$coinsearch (COINPAIRING) \n$recent')
     embed.add_field(name='Valid Time Frames (written how is):',value='1hour, 2hour, 4hour, 6hour, 8hour, 12hour, 1day')
     embed.add_field(name='Calculates/Finds?',value='RSI, OBV, and MACD Divergences (within 28 periods) and possible forming RSI Divergences')
     embed.add_field(name='Feedback, Changes, or Input?',value='Add me on Discord: rpp#9779')
@@ -169,7 +168,18 @@ async def coinsearch(ctx,coin:str):
         cr_msg = '**$histdiv:**\n{}\n**$currentdiv:**\n{}'.format(msg_fr_r,msg_cd_r)
         embed = discord.Embed(title='Search Results for {}'.format(coin),description=cr_msg)
         await bot.say(embed=embed)
-            
+
+@bot.command(pass_context=True)
+async def recent(ctx):
+    results_dict = bot.results_dict
+    filtered_results = recent_filter(results_dict)
+    msg_dict = recent_message(filtered_results)
+    #Create embed
+    embed = discord.Embed(title='Recent Divergences for All Time Frames',description='')
+    for k,v in msg_dict:
+        embed.add_field(name=k,value=v)
+    await bot.say(embed=embed)
+
 async def get_candles(coin,limitK,period):
     """Uses aiohttp to download data from Binance based on coin, period, and limit
     Parameters:
@@ -418,7 +428,7 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_mac
             if ll_price_broad[idx - 1] not in ll_price:
                 ll_price.append(ll_price_broad[idx - 1])
                 ll_idx.append(ll_idx_broad[idx_counter - 1])
-        if ll_price_broad[idx] < ll_price_broad[idx - 1] and ll_price_broad[idx] < ll_price_broad[idx + 1]:
+        if ll_price_broad[idx] < ll_price_broad[idx-1] and ll_price_broad[idx] < ll_price_broad[idx+1]:
             ll_price.append(ll_price_broad[idx])
             ll_idx.append(ll_idx_broad[idx_counter])
         idx_counter += 1
@@ -549,9 +559,9 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_mac
     macd_div_idx = []
     #Calculate score for any divergence and increase MACD divergence counter
     for idx in range(1,len(ll_price)):
-        if (ll_price[idx] - ll_price[idx - 1]) < 0 and ((ll_MACD_macd[idx] + ll_MACD_sigline[idx]) / 2) > ((ll_MACD_macd[idx - 1] + ll_MACD_sigline[idx - 1]) / 2):
+        if (ll_price[idx] - ll_price[idx - 1]) and ((ll_MACD_macd[idx] + ll_MACD_sigline[idx]) / 2) > ((ll_MACD_macd[idx - 1] + ll_MACD_sigline[idx - 1]) / 2):
             counter_trend_MACD += 1
-            score_MACD_MACD = (abs(ll_MACD_sigline[idx - 1] - ll_MACD_sigline[idx]) / (ll_MACD_sigline[idx - 1])) * 5
+            score_MACD_MACD = (abs(ll_MACD_sigline[idx - 1] - ll_MACD_sigline[idx]) / (ll_MACD_sigline[idx - 1])) * 10
             score_MACD_price = ((abs(ll_price[idx - 1] - ll_price[idx]) / (ll_price[idx - 1])) * 100) + 1
             score_MACD.append(abs(round(score_MACD_MACD * score_MACD_price,2)))
             #Record position of divergence
@@ -762,21 +772,16 @@ def find_tripdivs(full_results):
     Returns:
         trip_divs;list of strings
     '''
-    list_divs_RSI = []
-    list_divs_OBV = []
-    list_divs_MACD = []
-    for adict in full_results:
-        if adict['type div'] == 'RSI Divergence':
-            list_divs_RSI.append(adict['coin'])
-        if adict['type div'] == 'OBV Divergence':
-            list_divs_OBV.append(adict['coin'])
-        if adict['type div'] == 'MACD Divergence':
-            list_divs_MACD.append(adict['coin'])
+    list_divs_RSI = [r for r in full_results if r['type div'] == 'RSI Divergence']
+    list_divs_OBV = [r for r in full_results if r['type div'] == 'OBV Divergence']
+    list_divs_MACD = [r for r in full_results if r['type div '] == 'MACD Divergence']
     trip_divs = []
-    for coin in list_divs_RSI:
-        if coin in list_divs_OBV and coin in list_divs_MACD:
-            if coin not in trip_divs:
-                trip_divs.append(coin)
+    for r in list_divs_RSI:
+        for o in list_divs_OBV:
+            if r['position'][0] == o['position'][0] and r['position'][1] == o['position'][1]:
+                for m in list_divs_MACD:
+                    if r['position'][0] == m['position'][0] and r['position'][1] == m['position'][1]:
+                        trip_divs.append(r['coin'])
     return trip_divs
 
 def tripdivs_message(trip_divs):
@@ -893,6 +898,61 @@ def coinsearch_message(coin,results_dict):
         msg_cd_r = 'None\n'
 
     return msg_fr,msg_cd,msg_t,msg_fr_r,msg_cd_r
+
+def recent_filter(full_results):
+    '''
+    Parameters:
+        full_results;dictionary of tuples of dictionaries
+    Returns:
+        filtered_results;list of dictionaries
+    '''
+    time_periods = ['1h','2h','4h','6h','8h','12h','1d']
+    filtered_results = []
+    #Find all divergences at 1 period ago
+    for period in time_periods:
+        results = full_results[period][0]
+        for r in results:
+            if r['position'][1] == 1:
+                r['period'] = period
+                filtered_results.append(r)
+    return filtered_results
+
+def recent_message(results):
+    '''Makes the message for $recent command for embed
+    Paramters:
+        results;list of dictionaries
+    Returns:
+        msg_dict;list of dictionaries
+    '''
+    #Separate into individual time periods
+    r_1 = [r for r in results if r['period'] == '1h']
+    r_2 = [r for r in results if r['period'] == '2h']
+    r_4 = [r for r in results if r['period'] == '4h']
+    r_6 = [r for r in results if r['period'] == '6h']
+    r_8 = [r for r in results if r['period'] == '8h']
+    r_12 = [r for r in results if r['period'] == '12h']
+    r_24 = [r for r in results if r['period'] == '1d']
+    results_list = [r_1, r_2, r_4, r_6, r_8, r_12, r_24]
+    #Form messages
+    tf_converter = {'1h':'1 Hour:','2h':'2 Hour:','4h':'4 Hour:','6h':'6 Hour:','8h':'8 Hour:','12h':'12 Hour:','1d':'1 Day:'}
+    msg_dict = []
+    for idx in range(len(results_list)):
+        r = results_list[idx]
+        msg = ''
+        if len(r) != 0:
+            #Add Title
+            msg = msg + '__{}__\n'.format(tf_converter[r[0]['period']])
+            for rr in r:
+                new_msg = '{} | {} | Score: {} | Divergence {} to {} periods ago\n'.format(rr['coin'], rr['type div'], rr['score'], rr['position'][1], rr['position'][0])
+                msg = msg + new_msg
+            msg_dict.append({tf_converter[r[0]['period']]:msg})
+    #Rewrite for empty results
+    if len(msg_dict) == 0:
+        msg_dict = [{'None':'None'}]
+    return msg_dict
+
+
+
 
 
 my_token = os.environ.get('TOKEN')
