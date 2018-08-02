@@ -115,6 +115,9 @@ async def tripdiv(ctx,time_frame:str):
         message = tripdivs_message(trip_divs)
         embed_title = 'Historical Triple Divergence(s) for {} Candles'.format(tf_converter_print[time_frame])
         embed = discord.Embed(title=embed_title,description=message)
+        for msg in message:
+            header, description = msg
+            embed.add_field(name=header,value=description)
         await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
@@ -141,7 +144,7 @@ async def howmany(ctx):
         fr_divs.append(len(full_results))
         cd_divs.append(len(current_div_results))
         trip_divs = find_tripdivs(full_results)
-        t_divs.append(len(trip_divs))
+        t_divs.append(len(trip_divs) / 3)
     #Form message for embed
     fr_msg, cd_msg, t_msg = howmany_message(fr_divs,cd_divs,t_divs)
     embed = discord.Embed(title='**Number of Divergence for All Analyses**',description='*Analyses = Historical, Current, Triple*')
@@ -152,9 +155,10 @@ async def howmany(ctx):
 
 @bot.command(pass_context=True)
 async def coinsearch(ctx,coin:str):
+    coin = coin.upper()
     coin_list = ['ADABTC','ADXBTC','AEBTC','AIONBTC','AMBBTC','APPCBTC','ARKBTC','ARNBTC','ASTBTC','BATBTC','BCCBTC','BCDBTC','BCPTBTC','BLZBTC','BNBBTC','BNTBTC','BQXBTC','BRDBTC','BTGBTC','BTSBTC','CDTBTC','CHATBTC','CMTBTC','CNDBTC','DASHBTC','DGDBTC','DLTBTC','DNTBTC','EDOBTC','ELFBTC','ENGBTC','ENJBTC','EOSBTC','ETCBTC','ETHBTC','EVXBTC','FUELBTC','FUNBTC','GASBTC','GTOBTC','GVTBTC','HSRBTC','ICNBTC','ICXBTC','INSBTC','IOSTBTC','IOTABTC','KMDBTC','KNCBTC','LENDBTC','LINKBTC','LRCBTC','LSKBTC','LTCBTC','LUNBTC','MANABTC','MCOBTC','MDABTC','MODBTC','MTHBTC','MTLBTC','NANOBTC','NAVBTC','NCASHBTC','NEBLBTC','NEOBTC','NULSBTC','OAXBTC','OMGBTC','ONTBTC','OSTBTC','PIVXBTC','POABTC','POEBTC','POWRBTC','PPTBTC','QTUMBTC','RCNBTC','RDNBTC','REQBTC','RLCBTC','RPXBTC','SALTBTC','SNMBTC','SNTBTC','SNGLSBTC','STEEMBTC','STORJBTC','STRATBTC','SUBBTC','TNBBTC','TNTBTC','TRIGBTC','TRXBTC','VENBTC','VIABTC','VIBBTC','VIBEBTC','WABIBTC','WAVESBTC','WINGSBTC','WTCBTC','XLMBTC','XMRBTC','XVGBTC','XRPBTC','XZCBTC','YOYOBTC','ZECBTC','ZRXBTC','BCCUSDT','BNBUSDT','BTCUSDT','ETHUSDT','LTCUSDT','NEOUSDT']
     if coin not in coin_list:
-        await bot.say('**Not a valid coin** \n__Common Problems__: \nCoin pairing not uppercase \nCoin pairing does not have enough data to be run for results (will be added in the future) \nMispelling')
+        await bot.say('**Not a valid coin** \n__Common Problems__: \nCoin pairing does not have enough data to be run for results (will be added in the future) \nMispelling \nCoin Pairing not listed on Binance')
     else:
         results_dict = bot.results_dict
         msg_fr, msg_cd, msg_t, msg_fr_r, msg_cd_r = coinsearch_message(coin,results_dict)
@@ -178,6 +182,8 @@ async def recent(ctx):
     for d in msg_dict:
         for key in d:
             value = d[key]
+            if len(value) > 1024:
+                print('too long')
             embed.add_field(name=key,value=value)
     await bot.say(embed=embed)
 
@@ -780,30 +786,50 @@ def find_tripdivs(full_results):
     for r in list_divs_RSI:
         for o in list_divs_OBV:
             if r['position'][0] == o['position'][0] and r['position'][1] == o['position'][1]:
+                oo = o
                 for m in list_divs_MACD:
                     if r['position'][0] == m['position'][0] and r['position'][1] == m['position'][1]:
-                        if r['coin'] not in trip_divs:
-                            trip_divs.append(r['coin'])
+                        mm = m
+                        if len(trip_divs) != 0:
+                            td_coins = [t['coin'] for t in trip_divs]
+                        else:
+                            td_coins = []
+                        if r['coin'] not in td_coins:
+                            trip_divs.append(r)
+                            trip_divs.append(oo)
+                            trip_divs.append(mm)
     return trip_divs
 
 def tripdivs_message(trip_divs):
     '''Create message to be printed in embed for $tripdiv
     Parameters:
-        trip_divs;list of strings
+        trip_divs;list of dictionaries
     Returns:
-        tripdiv_message;str
+        msg;list of tuples(str,str)
     '''
-    message = ''
-    for idx in range(len(trip_divs)):
-        coin = trip_divs[idx]
-        if coin not in message:
-            if (idx + 1) % 7 == 0 or idx == (len(trip_divs) - 1):
-                message = message + '{}{}\n'.format(coin,(9 - len(coin)) * ' ')
-            else:
-                message = message + '{}{}'.format(coin,(9 - len(coin)) * ' ')
-    if len(message) == 0:
-        message = 'None'
-    return message 
+    msg = []
+    #Add coins to c_list without duplicates
+    c_list = list(set([t['coin'] for t in trip_divs]))
+    msg_list = []
+    for coin in c_list:
+        entry = [t for t in trip_divs if t['coin'] == coin]
+        entry = sort_based_on_score(entry)
+        msg_list.append(entry)
+    #make message (msg_list is a list of list)
+    for entry in msg_list:
+        coin = entry[0]['coin']
+        position = entry[0]['position']
+        #Add header
+        msg_1 = '__{}__: Divergence {} to {} periods ago\n'.format(coin,position[1],position[0])
+        #add entries for each divergence type
+        msg_2 = ''
+        for sub_entry in entry:
+            new_msg = '{} | Score: {}\n'.format(sub_entry['type div'],sub_entry['score'])
+            msg_2 = msg_2 + new_msg
+        #Add spacing
+        msg_2 = msg_2 + '\n'
+        msg.append((msg_1, msg_2))
+    return msg
 
 def howmany_message(fr_divs,cd_divs,t_divs):
     '''Creates message to be printed in embed for $howmany
