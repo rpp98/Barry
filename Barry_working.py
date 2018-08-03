@@ -116,9 +116,9 @@ async def tripdiv(ctx,time_frame:str):
         embed_title = 'Historical Triple Divergence(s) for {} Candles'.format(tf_converter_print[time_frame])
         embed = discord.Embed(title=embed_title,description=message)
         for msg in message:
-            header, description = msg
-            embed.add_field(name=header,value=description)
-        await bot.say(embed=embed)
+            header, descr = msg
+            embed = discord.Embed(title=header,description=descr)
+            await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
 async def helpme(ctx):
@@ -182,10 +182,8 @@ async def recent(ctx):
     for d in msg_dict:
         for key in d:
             value = d[key]
-            if len(value) > 1024:
-                print('too long')
-            embed.add_field(name=key,value=value)
-    await bot.say(embed=embed)
+            embed = discord.Embed(title=key,description=value)
+            await bot.say(embed=embed)
 
 async def get_candles(coin,limitK,period):
     """Uses aiohttp to download data from Binance based on coin, period, and limit
