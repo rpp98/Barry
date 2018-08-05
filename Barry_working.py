@@ -182,7 +182,7 @@ async def recent(ctx):
     for d in msg_dict:
         for header,body in d.items():
             for msg in body:
-                embed.add_field(name=header,value=msg)
+                embed.add_field(name='__{}__'.format(header),value=msg)
     await bot.say(embed=embed)
 
 async def get_candles(coin,limitK,period):
