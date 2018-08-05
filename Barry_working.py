@@ -115,8 +115,9 @@ async def tripdiv(ctx,time_frame:str):
         msg_list = tripdivs_message(trip_divs)
         embed_title = 'Historical Triple Divergence(s) for {} Candles'.format(tf_converter_print[time_frame])
         embed = discord.Embed(title=embed_title,description='')
-        for header,body in msg_list.items():
-            embed.add_field(name=header,value=body)
+        for result in msg_list:
+            for header,body in results.items():
+                embed.add_field(name=header,value=body)
         await bot.say(embed=embed)
         
 
@@ -144,7 +145,7 @@ async def howmany(ctx):
         fr_divs.append(len(full_results))
         cd_divs.append(len(current_div_results))
         trip_divs = find_tripdivs(full_results)
-        t_divs.append(len(trip_divs) / 3)
+        t_divs.append(len(trip_divs))
     #Form message for embed
     fr_msg, cd_msg, t_msg = howmany_message(fr_divs,cd_divs,t_divs)
     embed = discord.Embed(title='**Number of Divergence for All Analyses**',description='*Analyses = Historical, Current, Triple*')
