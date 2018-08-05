@@ -120,7 +120,6 @@ async def tripdiv(ctx,time_frame:str):
                 embed.add_field(name=header,value=body)
         await bot.say(embed=embed)
         
-
 @bot.command(pass_context=True)
 async def helpme(ctx):
     embed = discord.Embed(title='Help Guide',description='*A quick overview of the bot*')
@@ -181,10 +180,10 @@ async def recent(ctx):
     #Create embed
     embed = discord.Embed(title='Recent Divergences for All Time Frames',description='')
     for d in msg_dict:
-        for key in d:
-            value = d[key]
-            embed = discord.Embed(title=key,description=value)
-            await bot.say(embed=embed)
+        for header,body in d.items():
+            for msg in body:
+                embed.add_field(name=header,value=msg)
+    await bot.say(embed=embed)
 
 async def get_candles(coin,limitK,period):
     """Uses aiohttp to download data from Binance based on coin, period, and limit
@@ -807,7 +806,7 @@ def tripdivs_message(trip_divs):
     for result in trip_divs:
         for coin,results in result.items():
             #Make header
-            header = '__{}__: Divergence {} to {} periods ago\n'.format(coin,results[0]['position'][1],results[0]['position'][0])
+            header = '__{}__: Divergence {} to {} periods ago   \n'.format(coin,results[0]['position'][1],results[0]['position'][0])
             #Make body
             body = ''
             for r in results:
@@ -817,7 +816,6 @@ def tripdivs_message(trip_divs):
     if len(msg_list) == 0:
         msg_list = [{'None':'None'}]
     return msg_list
-
 
 def howmany_message(fr_divs,cd_divs,t_divs):
     '''Creates message to be printed in embed for $howmany
@@ -939,7 +937,7 @@ def recent_message(results):
     Paramters:
         results;list of dictionaries
     Returns:
-        msg_dict;list of dictionaries
+        msg_dict;list of dictionaries of lists
     '''
     #Separate into individual time periods
     r_1 = [r for r in results if r['period'] == '1h']
@@ -955,24 +953,28 @@ def recent_message(results):
     msg_dict = []
     for idx in range(len(results_list)):
         r = results_list[idx]
+        msg_list = []
         msg = ''
         if len(r) != 0:
             #Add Title
-            msg = msg + '__{}__\n'.format(tf_converter[r[0]['period']])
+            #msg = msg + '__{}__\n'.format(tf_converter[r[0]['period']])
             #Sort r based on score
             r = sorted(r, key=lambda r: float(r['score']),reverse=True)
+
             for rr in r:
                 new_msg = '{} | {} | Score: {} | Divergence {} to {} periods ago\n'.format(rr['coin'], rr['type div'], rr['score'], rr['position'][1], rr['position'][0])
-                msg = msg + new_msg
-            msg_dict.append({tf_converter[r[0]['period']]:msg})
+                if (len(msg) + len(new_msg)) > 1000:
+                    msg_list.append(msg)
+                    msg = new_msg
+                else:
+                    msg = msg + new_msg
+            msg_list.append(msg)
+            msg_dict.append({tf_converter[r[0]['period']]:msg_list})
+        
     #Rewrite for empty results
     if len(msg_dict) == 0:
         msg_dict = [{'None':'None'}]
     return msg_dict
-
-
-
-
 
 my_token = os.environ.get('TOKEN')
 bot.run(my_token)
