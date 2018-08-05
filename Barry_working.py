@@ -790,10 +790,10 @@ def find_tripdivs(full_results):
                     if r['coin'] == m['coin'] and (r['position'][0] - m['position'][0]) <= 1 and (r['position'][1] - m['position'][1]) <= 1:
                         #triple divergece found; format entry
                         entry = {r['coin']:[r,o,m]}
-                        coins.append(r['coin'])
                         #prevent duplicates
                         if r['coin'] not in coins:
                             trip_divs.append(entry)
+                        coins.append(r['coin'])
     return trip_divs
 
 def tripdivs_message(trip_divs):
