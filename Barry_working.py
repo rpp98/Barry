@@ -782,6 +782,7 @@ def find_tripdivs(full_results):
     ld_o = [r for r in full_results if r['type div'] == 'OBV Divergence']
     ld_m = [r for r in full_results if r['type div'] == 'MACD Divergence']
     #find triple divergences
+    coins = []
     for r in ld_r:
         for o in ld_o:
             if r['coin'] == o['coin'] and (r['position'][0] - o['position'][0]) <= 1 and (r['position'][1] - o['position'][1]) <= 1:
@@ -789,8 +790,9 @@ def find_tripdivs(full_results):
                     if r['coin'] == m['coin'] and (r['position'][0] - m['position'][0]) <= 1 and (r['position'][1] - m['position'][1]) <= 1:
                         #triple divergece found; format entry
                         entry = {r['coin']:[r,o,m]}
+                        coins.append(r['coin'])
                         #prevent duplicates
-                        if entry not in trip_divs:
+                        if r['coin'] not in coins:
                             trip_divs.append(entry)
     return trip_divs
 
