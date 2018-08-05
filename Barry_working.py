@@ -115,7 +115,7 @@ async def tripdiv(ctx,time_frame:str):
         msg_list = tripdivs_message(trip_divs)
         embed_title = 'Historical Triple Divergence(s) for {} Candles'.format(tf_converter_print[time_frame])
         embed = discord.Embed(title=embed_title,description='')
-        for header,body in msg_list:
+        for header,body in msg_list.items():
             embed.add_field(name=header,value=body)
         await bot.say(embed=embed)
         
