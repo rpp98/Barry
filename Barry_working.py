@@ -112,13 +112,13 @@ async def tripdiv(ctx,time_frame:str):
         trip_divs = find_tripdivs(results_desired_fr)
         #Format embed message for tripdivs
         tf_converter_print = {'1hour':'1 Hour','2hour':'2 Hour','4hour':'4 Hour','6hour':'6 Hour','8hour':'8 Hour','12hour':'12 Hour','1day':'1 Day'}
-        message = tripdivs_message(trip_divs)
+        msg_list = tripdivs_message(trip_divs)
         embed_title = 'Historical Triple Divergence(s) for {} Candles'.format(tf_converter_print[time_frame])
-        embed = discord.Embed(title=embed_title,description=message)
-        for msg in message:
-            header, descr = msg
-            embed = discord.Embed(title=header,description=descr)
-            await bot.say(embed=embed)
+        embed = discord.Embed(title=embed_title,description='')
+        for header,body in msg_list:
+            embed.add_field(name=header,value=body)
+        await bot.say(embed=embed)
+        
 
 @bot.command(pass_context=True)
 async def helpme(ctx):
@@ -666,8 +666,6 @@ def pre_comparator(list_price):
         trend_price = False
 
     return trend_price
-        
-coins_failure = ['CLOAKBTC','GRSBTC','QLCBTC','ONTBTC','POABTC','STORMBTC','SYSBTC','WPRBTC','XEMBTC','ZILBTC']
 
 def analysis_RSIOBVMACD(coin,coin_data,full_results,current_div_results):
     '''Main analysis function that runs and compiles all data into dictionaries for coins based on trends for RSI, OBV, and MACD
@@ -775,27 +773,22 @@ def find_tripdivs(full_results):
     Parameters:
         full_results;list of dictionaries
     Returns:
-        trip_divs;list of strings
+        trip_divs;list of dictionaries
     '''
-    list_divs_RSI = [r for r in full_results if r['type div'] == 'RSI Divergence']
-    list_divs_OBV = [r for r in full_results if r['type div'] == 'OBV Divergence']
-    list_divs_MACD = [r for r in full_results if r['type div'] == 'MACD Divergence']
     trip_divs = []
-    for r in list_divs_RSI:
-        for o in list_divs_OBV:
-            if r['position'][0] == o['position'][0] and r['position'][1] == o['position'][1]:
-                oo = o
-                for m in list_divs_MACD:
-                    if r['position'][0] == m['position'][0] and r['position'][1] == m['position'][1]:
-                        mm = m
-                        if len(trip_divs) != 0:
-                            td_coins = [t['coin'] for t in trip_divs]
-                        else:
-                            td_coins = []
-                        if r['coin'] not in td_coins:
-                            trip_divs.append(r)
-                            trip_divs.append(oo)
-                            trip_divs.append(mm)
+    #format = {coin:list of results}
+    ld_r = [r for r in full_results if r['type div'] == 'RSI Divergence']
+    ld_o = [r for r in full_results if r['type div'] == 'OBV Divergence']
+    ld_m = [r for r in full_results if r['type div'] == 'MACD Divergence']
+    #find triple divergences
+    for r in ld_r:
+        for o in ld_o:
+            if r['coin'] == o['coin'] and r['position'][0] == o['position'][0] and r['position'][1] == o['position'][1]:
+                for m in ld_m:
+                    if r['coin'] == m['coin'] and r['position'][0] == m['position'][0] and r['position'][1] == m['position'][1]:
+                        #triple divergece found; format entry
+                        entry = {r['coin']:[r,o,m]}
+                        trip_divs.append(entry)
     return trip_divs
 
 def tripdivs_message(trip_divs):
@@ -803,31 +796,23 @@ def tripdivs_message(trip_divs):
     Parameters:
         trip_divs;list of dictionaries
     Returns:
-        msg;list of tuples(str,str)
+        msg_list;list of dictionaries ({header:body})
     '''
-    msg = []
-    #Add coins to c_list without duplicates
-    c_list = list(set([t['coin'] for t in trip_divs]))
     msg_list = []
-    for coin in c_list:
-        entry = [t for t in trip_divs if t['coin'] == coin]
-        entry = sort_based_on_score(entry)
-        msg_list.append(entry)
-    #make message (msg_list is a list of list)
-    for entry in msg_list:
-        coin = entry[0]['coin']
-        position = entry[0]['position']
-        #Add header
-        msg_1 = '__{}__: Divergence {} to {} periods ago\n'.format(coin,position[1],position[0])
-        #add entries for each divergence type
-        msg_2 = ''
-        for sub_entry in entry:
-            new_msg = '{} | Score: {}\n'.format(sub_entry['type div'],sub_entry['score'])
-            msg_2 = msg_2 + new_msg
-        #Add spacing
-        msg_2 = msg_2 + '\n'
-        msg.append((msg_1, msg_2))
-    return msg
+    for result in trip_divs:
+        for coin,results in result.items():
+            #Make header
+            header = '__{}__: Divergence {} to {} periods ago\n'.format(coin,results[0]['position'][1],results[0]['position'][0])
+            #Make body
+            body = ''
+            for r in results:
+                msg = '{} | Score: {}\n'.format(r['type div'], r['score'])
+                body = body + msg
+            msg_list.append({header:body})
+    if len(msg_list) == 0:
+        msg_list = [{'None':'None'}]
+    return msg_list
+
 
 def howmany_message(fr_divs,cd_divs,t_divs):
     '''Creates message to be printed in embed for $howmany
