@@ -46,6 +46,7 @@ async def background_running_analysis():
                     for idx in range(len(results_current_div)):
                         results_cd.append(results_current_div[idx])
             results_dict[period] = (results_fr, results_cd)
+            bot.results_dict = results_dict
             await asyncio.sleep(10)
 
 #Bot command for analysis results
