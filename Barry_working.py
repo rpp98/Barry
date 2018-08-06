@@ -777,9 +777,9 @@ def find_tripdivs(full_results):
     '''
     trip_divs = []
     #format = {coin:list of results}
-    ld_r = [r for r in full_results if r['type div'] == 'RSI Divergence']
-    ld_o = [r for r in full_results if r['type div'] == 'OBV Divergence']
-    ld_m = [r for r in full_results if r['type div'] == 'MACD Divergence']
+    ld_r = [r for r in full_results if r['type div'] == 'RSI Divergence' and r['score'] > 1]
+    ld_o = [r for r in full_results if r['type div'] == 'OBV Divergence' and r['score'] > 1]
+    ld_m = [r for r in full_results if r['type div'] == 'MACD Divergence' and r['score'] > 1]
     #find triple divergences
     coins = []
     for r in ld_r:
