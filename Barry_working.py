@@ -565,7 +565,7 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_mac
     macd_div_idx = []
     #Calculate score for any divergence and increase MACD divergence counter
     for idx in range(1,len(ll_price)):
-        if (ll_price[idx] - ll_price[idx - 1]) and ((ll_MACD_macd[idx] + ll_MACD_sigline[idx]) / 2) > ((ll_MACD_macd[idx - 1] + ll_MACD_sigline[idx - 1]) / 2):
+        if (ll_price[idx] - ll_price[idx - 1]) < 0 and ((ll_MACD_macd[idx] + ll_MACD_sigline[idx]) / 2) > ((ll_MACD_macd[idx - 1] + ll_MACD_sigline[idx - 1]) / 2):
             counter_trend_MACD += 1
             score_MACD_MACD = (abs(ll_MACD_sigline[idx - 1] - ll_MACD_sigline[idx]) / (ll_MACD_sigline[idx - 1])) * 10
             score_MACD_price = ((abs(ll_price[idx - 1] - ll_price[idx]) / (ll_price[idx - 1])) * 100) + 1
