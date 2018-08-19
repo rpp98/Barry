@@ -187,17 +187,21 @@ async def recent(ctx):
     await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
-async def recent2(ctx):
-    results_dict = bot.results_dict
-    filtered_results = recent_filter(results_dict,2)
-    msg_dict = recent_message(filtered_results)
-    #Create embed
-    embed = discord.Embed(title='Second Most Recent Divergences for All Time Frames',description='')
-    for d in msg_dict:
-        for header,body in d.items():
-            for msg in body:
-                embed.add_field(name='__{}__'.format(header),value=msg)
-    await bot.say(embed=embed)
+async def filter(ctx,i:str):
+    if valid_when(i) == False:
+        await bot.say('Invalid inout for $filter command. Second input for command must be a whole number under 28')
+    else:
+        results_dict = bot.results_dict
+        i = int(i)
+        filtered_results = recent_filter(results_dict,i)
+        msg_dict = recent_message(filtered_results)
+        #Create embed
+        embed = discord.Embed(title='Divergences for All Time Frames for {} Periods Ago'.format(str(i)),description='')
+        for d in msg_dict:
+            for header,body in d.items():
+                for msg in body:
+                    embed.add_field(name='__{}__'.format(header),value=msg)
+        await bot.say(embed=embed)
 
 async def get_candles(coin,limitK,period):
     """Uses aiohttp to download data from Binance based on coin, period, and limit
@@ -607,7 +611,7 @@ def comparator_results_compiler(coin,trend_RSI,trend_OBV,trend_MACD,score_RSI,sc
     """
     if trend_RSI == True:
         for idx in range(len(score_RSI)):
-            full_results.append({'coin':coin,'type div':'RSI Divergence','score':score_RSI[idx],'position':[rsi_div_idx[idx * 2] - 1,rsi_div_idx[(idx * 2) + 1] - 1]})
+            full_results.append({'coin':coin,'type div':'RSI Divergence','score':score_RSI[idx],'position':[rsi_div_idx[idx * 2] - 1,rsi_div_idx[(idx * 2) + 1] + 1]})
     if trend_OBV == True:
         for idx in range(len(score_OBV)):
             full_results.append({'coin':coin,'type div':'OBV Divergence','score':score_OBV[idx],'position':[obv_div_idx[idx * 2],obv_div_idx[(idx * 2) + 1]]})
@@ -990,6 +994,22 @@ def recent_message(results):
     if len(msg_dict) == 0:
         msg_dict = [{'None':'None'}]
     return msg_dict
+
+def valid_when(i):
+    '''Checks for valid input on 'when' for filter command
+    Parameters:
+        when;int
+    Returns:
+        correct;bool
+    '''
+    try:
+        int(i)
+    except ValueError:
+        return False
+    if i >= 28:
+        return False
+    else:
+        return True
 
 my_token = os.environ.get('TOKEN')
 bot.run(my_token)
