@@ -612,13 +612,13 @@ def comparator_results_compiler(coin,trend_RSI,trend_OBV,trend_MACD,score_RSI,sc
     """
     if trend_RSI == True:
         for idx in range(len(score_RSI)):
-            full_results.append({'coin':coin,'type div':'RSI Divergence','score':score_RSI[idx],'position':[rsi_div_idx[idx * 2] - 1,rsi_div_idx[(idx * 2) + 1] + 1]})
+            full_results.append({'coin':coin,'type div':'RSI Divergence','score':score_RSI[idx],'position':[rsi_div_idx[idx * 2] + 1, rsi_div_idx[(idx * 2) + 1] + 1]})
     if trend_OBV == True:
         for idx in range(len(score_OBV)):
-            full_results.append({'coin':coin,'type div':'OBV Divergence','score':score_OBV[idx],'position':[obv_div_idx[idx * 2],obv_div_idx[(idx * 2) + 1]]})
+            full_results.append({'coin':coin,'type div':'OBV Divergence','score':score_OBV[idx],'position':[obv_div_idx[idx * 2] + 1, obv_div_idx[(idx * 2) + 1]]})
     if trend_MACD == True:
         for idx in range(len(score_MACD)):
-            full_results.append({'coin':coin,'type div':'MACD Divergence','score':score_MACD[idx],'position':[macd_div_idx[idx * 2],macd_div_idx[(idx * 2) + 1]]})
+            full_results.append({'coin':coin,'type div':'MACD Divergence','score':score_MACD[idx],'position':[macd_div_idx[idx * 2] + 1, macd_div_idx[(idx * 2) + 1]]})
     return full_results
 
 def current_div_results_compiler(coin,current_div_RSI,void_price,list_price,current_div_results):
@@ -940,7 +940,7 @@ def test_filter(full_results):
     for period in time_periods:
         results = full_results[period][0]
         for r in results:
-            if r['position'][1] == i:
+            if r['position'][1] == 1:
                 r['period'] = period
                 filtered_results.append(r)
     return filtered_results
