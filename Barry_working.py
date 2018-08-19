@@ -869,10 +869,10 @@ def divs_filter(full_results,i):
         full_results;list of dictionaries
         i;int
     Returns:
-        full_results;list of dictionaries
+        r;list of dictionaries
     '''
-    full_results[:] = [d for d in full_results if abs((d['position'][1] - d['position'][0])) >= i]
-    return full_results
+    r = [d for d in full_results if abs((d['position'][1] - d['position'][0])) >= i]
+    return r
 
 def score_filter(results):
     '''Filter out scores under 1 to prevent spam
@@ -881,7 +881,7 @@ def score_filter(results):
     Returns:
         r;list of dictionaries
     '''
-    r[:] = [d for d in results if int(d['score']) < 1]
+    r = [d for d in results if int(d['score']) < 1]
     return r
 
 def coinsearch_message(coin,results_dict):
