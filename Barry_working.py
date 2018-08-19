@@ -36,7 +36,8 @@ async def background_running_analysis():
             results_current_div = []
             for coin in coin_list:
                 normal_results = []
-                results_cd = []            
+                results_cd = []        
+                print(coin)    
                 coin_data = await get_candles(coin,80,period)
                 normal_results, results_current_div = analysis_RSIOBVMACD(coin,coin_data,normal_results,results_current_div)
                 if len(normal_results) > 0:
