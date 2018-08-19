@@ -62,7 +62,8 @@ async def histdiv(ctx,time_frame:str):
         results_dict = bot.results_dict
         results_desired_fr,results_desired_cd = results_dict[tf_to_period[time_frame]]
         #Format results into lists of strings for embedding and avoiding max length for messages in discord and embeds and based on value of 'score'
-        results_desired_fr = divs_filter(results_desired_fr)
+        results_desired_fr = divs_filter(results_desired_fr,1)
+        results_desired_fr = score_filter(results_desired_fr)
         full_results_sorted = sort_based_on_score(results_desired_fr)
         full_results_str_list = full_results_to_str(full_results_sorted)
         tf_converter_print = {'1hour':'1 hour','2hour':'2 hour','4hour':'4 hour','6hour':'6 hour','8hour':'8 hour','12hour':'12 hour','1day':'1 day'}
@@ -141,7 +142,9 @@ async def howmany(ctx):
     #determine number of divergence for historical, current, and triples
     for time_frame in time_frames:
         full_results, current_div_results = results_dict[time_frame]
-        full_results = divs_filter(full_results)
+        #Filter for space in divergence and minimum score
+        full_results = divs_filter(full_results,1)
+        full_results = score_filter(full_results)
         fr_divs.append(len(full_results))
         cd_divs.append(len(current_div_results))
         trip_divs = find_tripdivs(full_results)
@@ -176,8 +179,7 @@ async def coinsearch(ctx,coin:str):
 @bot.command(pass_context=True)
 async def recent(ctx):
     results_dict = bot.results_dict
-    filtered_results = test_filter(results_dict)
-    #filtered_results = recent_filter(results_dict,1)
+    filtered_results = recent_filter(results_dict,2)
     msg_dict = recent_message(filtered_results)
     #Create embed
     embed = discord.Embed(title='Recent Divergences for All Time Frames',description='')
@@ -190,7 +192,7 @@ async def recent(ctx):
 @bot.command(pass_context=True)
 async def filter(ctx,i:str):
     if valid_when(i) == False:
-        await bot.say('Invalid inout for $filter command. Second input for command must be a whole number under 28')
+        await bot.say('Invalid input for $filter command. Second input for command must be a whole number between 2 and 28')
     else:
         results_dict = bot.results_dict
         i = int(i)
@@ -612,13 +614,13 @@ def comparator_results_compiler(coin,trend_RSI,trend_OBV,trend_MACD,score_RSI,sc
     """
     if trend_RSI == True:
         for idx in range(len(score_RSI)):
-            full_results.append({'coin':coin,'type div':'RSI Divergence','score':score_RSI[idx],'position':[rsi_div_idx[idx * 2] + 1, rsi_div_idx[(idx * 2) + 1] + 1]})
+            full_results.append({'coin':coin,'type div':'RSI Divergence','score':score_RSI[idx],'position':[rsi_div_idx[idx * 2], rsi_div_idx[(idx * 2) + 1]]})
     if trend_OBV == True:
         for idx in range(len(score_OBV)):
-            full_results.append({'coin':coin,'type div':'OBV Divergence','score':score_OBV[idx],'position':[obv_div_idx[idx * 2] + 1, obv_div_idx[(idx * 2) + 1]]})
+            full_results.append({'coin':coin,'type div':'OBV Divergence','score':score_OBV[idx],'position':[obv_div_idx[idx * 2], obv_div_idx[(idx * 2) + 1]]})
     if trend_MACD == True:
         for idx in range(len(score_MACD)):
-            full_results.append({'coin':coin,'type div':'MACD Divergence','score':score_MACD[idx],'position':[macd_div_idx[idx * 2] + 1, macd_div_idx[(idx * 2) + 1]]})
+            full_results.append({'coin':coin,'type div':'MACD Divergence','score':score_MACD[idx],'position':[macd_div_idx[idx * 2], macd_div_idx[(idx * 2) + 1]]})
     return full_results
 
 def current_div_results_compiler(coin,current_div_RSI,void_price,list_price,current_div_results):
@@ -860,16 +862,27 @@ def howmany_message(fr_divs,cd_divs,t_divs):
         t_msg = t_msg + new_msg
     return fr_msg, cd_msg, t_msg
 
-def divs_filter(full_results):
+def divs_filter(full_results,i):
     '''Reduces number of results in full_results by analyzing length of divergence period (5 or more only)
     (in response to an accuracy update which captures quicker divergences)
     Parameters:
         full_results;list of dictionaries
+        i;int
     Returns:
         full_results;list of dictionaries
     '''
-    full_results[:] = [d for d in full_results if abs((d['position'][1] - d['position'][0])) >= 1]
+    full_results[:] = [d for d in full_results if abs((d['position'][1] - d['position'][0])) >= i]
     return full_results
+
+def score_filter(results):
+    '''Filter out scores under 1 to prevent spam
+    Paramters:
+        results;list of dictionaries
+    Returns:
+        r;list of dictionaries
+    '''
+    r[:] = [d for d in results if int(d['score']) < 1]
+    return r
 
 def coinsearch_message(coin,results_dict):
     '''Creates message to be printed in embed for $coinsearch
@@ -888,7 +901,7 @@ def coinsearch_message(coin,results_dict):
     msg_cd_r = ''
     for time_frame in time_frames:
         full_results, current_div_results = results_dict[time_frame]
-        full_results = divs_filter(full_results)
+        full_results = divs_filter(full_results,1)
         #find occurrences in full_results
         coins_fr = [adict['coin'] for adict in full_results]
         if coin in coins_fr:
@@ -932,18 +945,6 @@ def coinsearch_message(coin,results_dict):
         msg_cd_r = 'None\n'
 
     return msg_fr,msg_cd,msg_t,msg_fr_r,msg_cd_r
-
-def test_filter(full_results):
-    time_periods = ['1h','2h','4h','6h','8h','12h','1d']
-    filtered_results = []
-    #Find all divergences at 1 period ago
-    for period in time_periods:
-        results = full_results[period][0]
-        for r in results:
-            if r['position'][1] == 1:
-                r['period'] = period
-                filtered_results.append(r)
-    return filtered_results
 
 def recent_filter(full_results,i):
     '''
@@ -1019,7 +1020,7 @@ def valid_when(i):
         int(i)
     except ValueError:
         return False
-    if int(i) >= 28:
+    if int(i) >= 28 or int(i) <= 1:
         return False
     else:
         return True
