@@ -25,7 +25,7 @@ async def background_running_analysis():
     bot.results_dict = results_dict
     while True:
         #coin_failures are to keep track of which coins dont work (aka not enough data)
-        coin_failures = ['DENTBTC', 'MFTBTC', 'KEYBTC', 'NASBTC', 'NPXSBTC', 'VENUSDT', 'DATABTC', 'NXSBTC', 'SCBTC', 'ETCUSDT', 'ICXUSDT', 'ONTUSDT', 'TRXUSDT', 'AGIBTC', 'QKCBTC']
+        coin_failures = ['DENTBTC', 'MFTBTC', 'KEYBTC', 'NASBTC', 'NPXSBTC', 'VENUSDT', 'DATABTC', 'NXSBTC', 'SCBTC', 'ETCUSDT', 'ICXUSDT', 'ONTUSDT', 'TUSDBTC','TRXUSDT', 'AGIBTC', 'QKCBTC']
         coin_list1 = ['NAVBTC'] #pour testing
         coin_list = ['ADABTC', 'ADXBTC', 'AEBTC', 'AIONBTC', 'AMBBTC', 'APPCBTC', 'ARKBTC', 'ARNBTC', 'ASTBTC', 'BATBTC', 'BCCBTC', 'BCDBTC', 'BCNBTC','BCPTBTC', 'BLZBTC', 'BNBBTC', 'BNTBTC', 'BQXBTC', 'BRDBTC', 'BTGBTC', 'BTSBTC', 'CDTBTC', 'CHATBTC', 'CLOAKBTC', 'CMTBTC', 'CNDBTC', 'DASHBTC', 'DGDBTC', 'DLTBTC', 'DNTBTC', 'EDOBTC', 'ELFBTC', 'ENGBTC', 'ENJBTC', 'EOSBTC', 'ETCBTC', 'ETHBTC', 'EVXBTC', 'FUELBTC', 'FUNBTC', 'GASBTC', 'GNTBTC','GRSBTC', 'GTOBTC', 'GVTBTC', 'GXSBTC', 'HSRBTC', 'ICNBTC', 'ICXBTC', 'INSBTC', 'IOSTBTC', 'IOTABTC', 'IOTXBTC', 'KMDBTC', 'KNCBTC', 'LENDBTC', 'LINKBTC', 'LOOMBTC', 'LRCBTC', 'LSKBTC', 'LTCBTC', 'LUNBTC', 'MANABTC', 'MCOBTC', 'MDABTC', 'MODBTC', 'MTHBTC', 'MTLBTC', 'NANOBTC', 'NAVBTC', 'NCASHBTC', 'NEBLBTC', 'NEOBTC', 'NULSBTC', 'OAXBTC', 'OMGBTC', 'ONTBTC', 'OSTBTC', 'PIVXBTC', 'POABTC', 'POEBTC', 'POWRBTC', 'PPTBTC', 'QLCBTC', 'QSPBTC', 'QTUMBTC', 'RCNBTC', 'RDNBTC', 'REPBTC','REQBTC', 'RLCBTC', 'RPXBTC', 'SALTBTC', 'SKYBTC','SNMBTC', 'SNTBTC', 'SNGLSBTC', 'STEEMBTC', 'STORJBTC', 'STRATBTC', 'SUBBTC', 'SYSBTC', 'THETABTC','TNBBTC', 'TNTBTC', 'TRIGBTC', 'TRXBTC', 'VIABTC', 'VIBBTC', 'VIBEBTC', 'WABIBTC', 'WANBTC', 'WAVESBTC', 'WINGSBTC', 'WPRBTC', 'WTCBTC', 'XEMBTC', 'XLMBTC', 'XMRBTC', 'XVGBTC', 'XRPBTC', 'XZCBTC', 'YOYOBTC', 'ZECBTC', 'ZENBTC','ZILBTC', 'ZRXBTC', 'ADAUSDT', 'BCCUSDT', 'BNBUSDT', 'BTCUSDT', 'ETHUSDT', 'EOSUSDT', 'IOTABTC', 'LTCUSDT', 'NEOUSDT', 'QTUMUSDT', 'XLMUSDT', 'XRPUSDT']
         #Calculate for all time periods 
@@ -36,8 +36,7 @@ async def background_running_analysis():
             results_current_div = []
             for coin in coin_list:
                 normal_results = []
-                results_cd = []        
-                print(coin)    
+                results_cd = []           
                 coin_data = await get_candles(coin,80,period)
                 normal_results, results_current_div = analysis_RSIOBVMACD(coin,coin_data,normal_results,results_current_div)
                 if len(normal_results) > 0:
@@ -177,7 +176,8 @@ async def coinsearch(ctx,coin:str):
 @bot.command(pass_context=True)
 async def recent(ctx):
     results_dict = bot.results_dict
-    filtered_results = recent_filter(results_dict,1)
+    filtered_results = test_filter(results_dict)
+    #filtered_results = recent_filter(results_dict,1)
     msg_dict = recent_message(filtered_results)
     #Create embed
     embed = discord.Embed(title='Recent Divergences for All Time Frames',description='')
@@ -933,7 +933,19 @@ def coinsearch_message(coin,results_dict):
 
     return msg_fr,msg_cd,msg_t,msg_fr_r,msg_cd_r
 
-def recent_filter(full_results,p):
+def test_filter(full_results):
+    time_periods = ['1h','2h','4h','6h','8h','12h','1d']
+    filtered_results = []
+    #Find all divergences at 1 period ago
+    for period in time_periods:
+        results = full_results[period][0]
+        for r in results:
+            if r['position'][1] == i:
+                r['period'] = period
+                filtered_results.append(r)
+    return filtered_results
+
+def recent_filter(full_results,i):
     '''
     Parameters:
         full_results;dictionary of tuples of dictionaries
@@ -947,7 +959,7 @@ def recent_filter(full_results,p):
     for period in time_periods:
         results = full_results[period][0]
         for r in results:
-            if r['position'][1] == p:
+            if r['position'][1] == i:
                 r['period'] = period
                 filtered_results.append(r)
     return filtered_results
