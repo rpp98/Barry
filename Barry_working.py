@@ -1,4 +1,4 @@
-#xD
+#RSI and OBV Divergence Indicator Bot created by rpp
 
 import discord
 from discord.ext import commands
@@ -778,9 +778,9 @@ def find_tripdivs(full_results):
     '''
     trip_divs = []
     #format = {coin:list of results}
-    ld_r = [r for r in full_results if r['type div'] == 'RSI Divergence' and r['score'] > 1]
-    ld_o = [r for r in full_results if r['type div'] == 'OBV Divergence' and r['score'] > 1]
-    ld_m = [r for r in full_results if r['type div'] == 'MACD Divergence' and r['score'] > 1]
+    ld_r = [r for r in full_results if r['type div'] == 'RSI Divergence']
+    ld_o = [r for r in full_results if r['type div'] == 'OBV Divergence']
+    ld_m = [r for r in full_results if r['type div'] == 'MACD Divergence']
     #find triple divergences
     coins = []
     for r in ld_r:
@@ -850,7 +850,7 @@ def divs_filter(full_results):
     Returns:
         full_results;list of dictionaries
     '''
-    full_results[:] = [d for d in full_results if abs((d['position'][1] - d['position'][0])) >= 5]
+    full_results[:] = [d for d in full_results if abs((d['position'][1] - d['position'][0])) >= 1]
     return full_results
 
 def coinsearch_message(coin,results_dict):
