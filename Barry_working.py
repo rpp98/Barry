@@ -49,7 +49,7 @@ async def background_running_analysis():
             bot.results_dict = results_dict
             await asyncio.sleep(10)
 
-#Bot command for analysis results
+#Bot commands for analysis results
 @bot.command(pass_context=True)
 async def histdiv(ctx,time_frame:str):
     valid_time_frames = ['1hour','2hour','4hour','6hour','8hour','12hour','1day']
@@ -176,10 +176,23 @@ async def coinsearch(ctx,coin:str):
 @bot.command(pass_context=True)
 async def recent(ctx):
     results_dict = bot.results_dict
-    filtered_results = recent_filter(results_dict)
+    filtered_results = recent_filter(results_dict,1)
     msg_dict = recent_message(filtered_results)
     #Create embed
     embed = discord.Embed(title='Recent Divergences for All Time Frames',description='')
+    for d in msg_dict:
+        for header,body in d.items():
+            for msg in body:
+                embed.add_field(name='__{}__'.format(header),value=msg)
+    await bot.say(embed=embed)
+
+@bot.command(pass_context=True)
+async def recent2(ctx):
+    results_dict = bot.results_dict
+    filtered_results = recent_filter(results_dict,2)
+    msg_dict = recent_message(filtered_results)
+    #Create embed
+    embed = discord.Embed(title='Second Most Recent Divergences for All Time Frames',description='')
     for d in msg_dict:
         for header,body in d.items():
             for msg in body:
@@ -422,7 +435,7 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_mac
     idx_counter = 1
     #Find local lows of Price (ll_price_broad)
     for idx in range(1,len(list_price) - 1):
-        if list_price[idx] < list_price[idx-1] and list_price[idx] < list_price[idx+1]:
+        if list_price[idx] <= list_price[idx-1] and list_price[idx] <= list_price[idx+1]:
             ll_price_broad.append(list_price[idx])
             ll_idx_broad.append(idx_counter)
         idx_counter += 1
@@ -915,10 +928,11 @@ def coinsearch_message(coin,results_dict):
 
     return msg_fr,msg_cd,msg_t,msg_fr_r,msg_cd_r
 
-def recent_filter(full_results):
+def recent_filter(full_results,p):
     '''
     Parameters:
         full_results;dictionary of tuples of dictionaries
+        p;int
     Returns:
         filtered_results;list of dictionaries
     '''
@@ -928,7 +942,7 @@ def recent_filter(full_results):
     for period in time_periods:
         results = full_results[period][0]
         for r in results:
-            if r['position'][1] == 1:
+            if r['position'][1] == p:
                 r['period'] = period
                 filtered_results.append(r)
     return filtered_results
