@@ -10,13 +10,12 @@ import os
 
 #Bot Command Prefix
 bot = commands.Bot(command_prefix='$')
-client = discord.Client()
 
 #Launching Barry Statement
 @bot.event
 async def on_ready():
     print('Ready to analyze')
-    client.loop.create_task(background_running_analysis())
+    bot.loop.create_task(background_running_analysis())
 
 #Result updater background task
 async def background_running_analysis():
@@ -205,6 +204,12 @@ async def filter(ctx,i:str):
                 for msg in body:
                     embed.add_field(name='__{}__'.format(header),value=msg)
         await bot.say(embed=embed)
+
+@bot.command(pass_context=True)
+async def test(ctx,useless_command:str):
+    if useless_command == 'cheater':
+        print(len(bot.servers))
+        print(bot.servers)
 
 async def get_candles(coin,limitK,period):
     """Uses aiohttp to download data from Binance based on coin, period, and limit
@@ -881,7 +886,7 @@ def score_filter(results):
     Returns:
         r;list of dictionaries
     '''
-    r = [d for d in results if int(d['score']) > 1]
+    r = [d for d in results if float(d['score']) > 1]
     return r
 
 def coinsearch_message(coin,results_dict):
