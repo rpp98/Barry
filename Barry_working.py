@@ -814,7 +814,7 @@ def find_tripdivs(full_results):
             if r['coin'] == o['coin'] and (r['position'][0] - o['position'][0]) <= 1 and (r['position'][1] - o['position'][1]) <= 1:
                 for m in ld_m:
                     if r['coin'] == m['coin'] and (r['position'][0] - m['position'][0]) <= 1 and (r['position'][1] - m['position'][1]) <= 1:
-                        if float(r['score']) > 1 and float(o['score']) > 1 and float(m['score']) > 1:
+                        if float(r['score']) > 1 or float(o['score']) > 1 or float(m['score']) > 1:
                             #triple divergece found; format entry
                             entry = {r['coin']:[r,o,m]}
                             #prevent duplicates
