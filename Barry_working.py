@@ -142,11 +142,11 @@ async def howmany(ctx):
     for time_frame in time_frames:
         full_results, current_div_results = results_dict[time_frame]
         #Filter for space in divergence and minimum score
-        full_results = divs_filter(full_results,1)
-        full_results = score_filter(full_results)
-        fr_divs.append(len(full_results))
+        full_results2 = divs_filter(full_results,1)
+        full_results_sorted = score_filter(full_results2)
+        fr_divs.append(len(full_results_sorted))
         cd_divs.append(len(current_div_results))
-        trip_divs = find_tripdivs(full_results)
+        trip_divs = find_tripdivs(full_results_sorted)
         t_divs.append(len(trip_divs))
     #Form message for embed
     fr_msg, cd_msg, t_msg = howmany_message(fr_divs,cd_divs,t_divs)
