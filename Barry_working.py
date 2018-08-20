@@ -146,7 +146,7 @@ async def howmany(ctx):
         full_results_sorted = score_filter(full_results2)
         fr_divs.append(len(full_results_sorted))
         cd_divs.append(len(current_div_results))
-        trip_divs = find_tripdivs(full_results_sorted)
+        trip_divs = find_tripdivs(full_results)
         t_divs.append(len(trip_divs))
     #Form message for embed
     fr_msg, cd_msg, t_msg = howmany_message(fr_divs,cd_divs,t_divs)
@@ -196,7 +196,8 @@ async def filter(ctx,i:str):
         results_dict = bot.results_dict
         i = int(i)
         filtered_results = recent_filter(results_dict,i)
-        msg_dict = recent_message(filtered_results)
+        fr = score_filter(filtered_results)
+        msg_dict = recent_message(fr)
         #Create embed
         embed = discord.Embed(title='Divergences for All Time Frames for {} Periods Ago'.format(str(i)),description='')
         for d in msg_dict:
@@ -813,12 +814,13 @@ def find_tripdivs(full_results):
             if r['coin'] == o['coin'] and (r['position'][0] - o['position'][0]) <= 1 and (r['position'][1] - o['position'][1]) <= 1:
                 for m in ld_m:
                     if r['coin'] == m['coin'] and (r['position'][0] - m['position'][0]) <= 1 and (r['position'][1] - m['position'][1]) <= 1:
-                        #triple divergece found; format entry
-                        entry = {r['coin']:[r,o,m]}
-                        #prevent duplicates
-                        if r['coin'] not in coins:
-                            trip_divs.append(entry)
-                        coins.append(r['coin'])
+                        if float(r['score']) > 1 and float(o['score']) > 1 and float(m['score']) > 1:
+                            #triple divergece found; format entry
+                            entry = {r['coin']:[r,o,m]}
+                            #prevent duplicates
+                            if r['coin'] not in coins:
+                                trip_divs.append(entry)
+                            coins.append(r['coin'])
     return trip_divs
 
 def tripdivs_message(trip_divs):
