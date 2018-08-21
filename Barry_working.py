@@ -1,5 +1,4 @@
 #RSI and OBV Divergence Indicator Bot created by rpoxx
-
 import discord
 from discord.ext import commands
 from discord.ext.commands import Bot
