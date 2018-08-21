@@ -185,6 +185,7 @@ async def recent(ctx):
     for d in msg_dict:
         for header,body in d.items():
             for msg in body:
+                print(len(msg))
                 embed.add_field(name='__{}__'.format(header),value=msg)
     #Tripdiv section
     await bot.say(embed=embed)
@@ -195,6 +196,7 @@ async def recent(ctx):
     for result in msg_list:
         for header,body in result.items():
             for msg in body:
+                print(len(body))
                 embed.add_field(name=header,value=msg)
     await bot.say(embed=embed)
 
