@@ -184,13 +184,15 @@ async def recent(ctx):
     embed = discord.Embed(title='Recent Divergences for All Time Frames',description='')
     for d in msg_dict:
         for header,body in d.items():
-            print('header',len(header))
+            char_counter += len(header)
             for msg in body:
-                print(len(msg))
+                char_counter += len(msg)
+                if char_counter > 5000:
+                    await bot.say(embed=embed)
+                    await asyncio.sleep(0.05)
+                    char_counter = 0
                 embed.add_field(name='__{}__'.format(header),value=msg)
-    #Tripdiv section
     await bot.say(embed=embed)
-    '''
     await asyncio.sleep(0.05)
     embed = discord.Embed(title='__Recent Triple Divergences__',value='')
     trip_divs = find_tripdivs(filtered_results)
@@ -201,7 +203,6 @@ async def recent(ctx):
                 print(len(body))
                 embed.add_field(name=header,value=msg)
     await bot.say(embed=embed)
-    '''
 
 @bot.command(pass_context=True)
 async def filter(ctx,i:str):
@@ -215,15 +216,21 @@ async def filter(ctx,i:str):
         msg_dict = recent_message(fr)
         #Create embed
         embed = discord.Embed(title='Divergences for All Time Frames for {} Periods Ago'.format(str(i)),description='')
+        char_counter = 0
         for d in msg_dict:
             for header,body in d.items():
+                char_counter += len(header)
                 for msg in body:
+                    char_counter += len(msg)
+                    if char_counter > 5000:
+                        await bot.say(embed=embed)
+                        char_counter = 0
                     embed.add_field(name='__{}__'.format(header),value=msg)
         await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
 async def test(ctx,useless_command:str):
-    if useless_command == 'cheater':
+    if useless_command == 'weewoo':
         print(len(bot.servers))
         print(bot.servers)
 
