@@ -1,4 +1,5 @@
 #RSI and OBV Divergence Indicator Bot created by rpp
+
 import discord
 from discord.ext import commands
 from discord.ext.commands import Bot
@@ -186,7 +187,9 @@ async def recent(ctx):
             for msg in body:
                 embed.add_field(name='__{}__'.format(header),value=msg)
     #Tripdiv section
-    embed.add_field(name='__Recent Triple Divergences__',value='')
+    await bot.say(embed=embed)
+    await asyncio.sleep(0.05)
+    embed = discord.Embed(title='__Recent Triple Divergences__',value='')
     trip_divs = find_tripdivs(filtered_results)
     msg_list = tripdivs_message(trip_divs)
     for result in msg_list:
