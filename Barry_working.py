@@ -186,6 +186,13 @@ async def recent(ctx):
         for header,body in d.items():
             for msg in body:
                 embed.add_field(name='__{}__'.format(header),value=msg)
+    #Tripdiv section
+    embed.add_field(name='__Recent Triple Divergences__',value='')
+    trip_divs = find_tripdivs(filtered_results)
+    msg_list = tripdivs_message(trip_divs)
+    for result in msg_list:
+        for header,body in result.items():
+            embed.add_field(name=header,value=body)
     await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
@@ -956,8 +963,8 @@ def coinsearch_message(coin,results_dict):
 def recent_filter(full_results,i):
     '''
     Parameters:
-        full_results;dictionary of tuples of dictionaries
-        p;int
+        full_results;dictionary of tuples of lists
+        i;int
     Returns:
         filtered_results;list of dictionaries
     '''
@@ -965,9 +972,11 @@ def recent_filter(full_results,i):
     filtered_results = []
     #Find all divergences at 1 period ago
     for period in time_periods:
+        #Take hist results (not currentdiv)
         results = full_results[period][0]
         for r in results:
             if r['position'][1] == i:
+                #overwrite entry for 'period' with labeled period from loop
                 r['period'] = period
                 filtered_results.append(r)
     return filtered_results
