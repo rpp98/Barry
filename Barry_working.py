@@ -182,6 +182,7 @@ async def recent(ctx):
     msg_dict = recent_message(filtered_results)
     #Create embed
     embed = discord.Embed(title='Recent Divergences for All Time Frames',description='')
+    char_counter = 0
     for d in msg_dict:
         for header,body in d.items():
             char_counter += len(header)
