@@ -184,6 +184,7 @@ async def recent(ctx):
     embed = discord.Embed(title='Recent Divergences for All Time Frames',description='')
     for d in msg_dict:
         for header,body in d.items():
+            print('header',len(header))
             for msg in body:
                 print(len(msg))
                 embed.add_field(name='__{}__'.format(header),value=msg)
