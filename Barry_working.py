@@ -195,14 +195,13 @@ async def recent(ctx):
                 embed.add_field(name='__{}__'.format(header),value=msg)
     await bot.say(embed=embed)
     await asyncio.sleep(0.05)
+    #Trip Divs
     embed = discord.Embed(title='__Recent Triple Divergences__',value='')
     trip_divs = find_tripdivs(filtered_results)
     msg_list = tripdivs_message(trip_divs)
     for result in msg_list:
         for header,body in result.items():
-            for msg in body:
-                print(len(body))
-                embed.add_field(name=header,value=msg)
+            embed.add_field(name=header,value=msg)
     await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
