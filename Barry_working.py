@@ -110,7 +110,8 @@ async def tripdiv(ctx,time_frame:str):
         results_dict = bot.results_dict
         results_desired_fr,results_desired_cd = results_dict[tf_to_period[time_frame]]
         #Find triple divergences
-        trip_divs = find_tripdivs(results_desired_fr)
+        results_sorted = sort_based_on_score(results_desired_fr)
+        trip_divs = find_tripdivs(results_sorted)
         #Format embed message for tripdivs
         tf_converter_print = {'1hour':'1 Hour','2hour':'2 Hour','4hour':'4 Hour','6hour':'6 Hour','8hour':'8 Hour','12hour':'12 Hour','1day':'1 Day'}
         msg_list = tripdivs_message(trip_divs)
@@ -197,11 +198,22 @@ async def recent(ctx):
     await asyncio.sleep(0.05)
     #Trip Divs
     embed = discord.Embed(title='__Recent Triple Divergences__',value='')
-    trip_divs = find_tripdivs(filtered_results)
-    msg_list = tripdivs_message(trip_divs)
-    for result in msg_list:
-        for header,body in result.items():
-            embed.add_field(name=header,value=msg)
+    time_frames = ['1h','2h','4h','6h','8h','12h','1d']
+    tf_converter = {'1h':'1 Hour', '2h':'2 Hour', '4h':'4 Hour', '6h':'6 Hour', '8h':'8 Hour', '12h':'12 Hour', '1d':'1 Day'}
+    for time_frame in time_frames:
+        results = results_dict[time_frame][0]
+        filtered_results = recent_filter(results,2)
+        trip_divs = find_tripdivs(filtered_results)
+        msg_list = tripdivs_message(trip_divs)
+        if len(msg_list) != 0:
+            #Create name for embed field
+            field_name = tf_converter[time_frame]
+            #Create value for embed field
+            field_value = ''
+            for result in msg_list:
+                for header,body in result.items():
+                    field_value = field_value + '__{}__:\n{}'.format(header,body)
+            embed.add_field(name=field_name,value=field_value)
     await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
