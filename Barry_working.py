@@ -213,6 +213,8 @@ async def recent(ctx):
             for result in msg_list:
                 for header,body in result.items():
                     field_value = field_value + '__{}__:\n{}'.format(header,body)
+            print(len(field_name))
+            print(len(field_value),field_value)
             embed.add_field(name=field_name,value=field_value)
     await bot.say(embed=embed)
 
