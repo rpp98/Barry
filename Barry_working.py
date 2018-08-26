@@ -208,6 +208,7 @@ async def recent(ctx):
         trip_divs = find_tripdivs(fr)
         if len(trip_divs) != 0:
             msg_list = tripdivs_message(trip_divs)
+            print('tf',tf_converter[time_frame])
             embed_td.add_field(name='__{}__:'.format(tf_converter[time_frame]),value='')
             for result in msg_list:
                 for header,body in result.items():
