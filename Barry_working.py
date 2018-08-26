@@ -215,6 +215,8 @@ async def recent(ctx):
             msg_list = tripdivs_message(result)
             for trip_div in msg_list:
                 for header,body in trip_div.items():
+                    print('H',header)
+                    print('B',body)
                     embed2.add_field(name=header,value=body)
     else:
         embed2.add_field(name='None',value='None')
@@ -979,7 +981,8 @@ def coinsearch_message(coin,results_dict):
 
         #find occurrences in triple div
         trip_divs = find_tripdivs(full_results)
-        if coin in trip_divs:
+        coins_td = [coin for coin,info in trip_divs.items()]
+        if coin in coins_td:
             msg_t = msg_t + '{}: :white_check_mark:\n'.format(time_frame)
         else:
             msg_t = msg_t + '{}: :x:\n'.format(time_frame)
