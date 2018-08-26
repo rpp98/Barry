@@ -211,6 +211,8 @@ async def recent(ctx):
             embed_td.add_field(name='__{}__:'.format(tf_converter[time_frame]),value='')
             for result in msg_list:
                 for header,body in result.items():
+                    print('h',header)
+                    print('b',body)
                     embed_td.add_field(name=header,value=body)
     await bot.say(embed=embed_td)
 
