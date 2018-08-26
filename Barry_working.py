@@ -200,27 +200,19 @@ async def recent(ctx):
     #Trip Divs
     time_frames = ['1h','2h','4h','6h','8h','12h','1d']
     tf_converter = {'1h':'1 Hour', '2h':'2 Hour', '4h':'4 Hour', '6h':'6 Hour', '8h':'8 Hour', '12h':'12 Hour', '1d':'1 Day'}
-    td = {}
     #Organize and sort results for triple divergences
+    embed_td = discord.Embed(title='Recent Triple Divergences',value='')
+    filtered_results = recent_filter(results_dict, 2)
     for time_frame in time_frames:
-        filtered_results = recent_filter(results_dict, 2)
-        trip_divs = find_tripdivs(filtered_results)
-        if trip_divs[0] != {'None':'None'}:
-            td[tf_converter[time_frame]] = trip_divs
-    #Make messages and embed
-    embed2 = discord.Embed(title='__Recent Triple Divergences__',value='')
-    if len(td) != 0:
-        for time_frame,result in td.items():
-            embed2.add_field(name='__{}__:'.format(time_frame),value='')
-            msg_list = tripdivs_message(result)
-            for trip_div in msg_list:
-                for header,body in trip_div.items():
-                    print('H',header)
-                    print('B',body)
-                    embed2.add_field(name=header,value=body)
-    else:
-        embed2.add_field(name='None',value='None')
-    await bot.say(embed=embed2)
+        fr = [r for r in filtered_results if r['period'] == time_frame]
+        trip_divs = find_tripdivs(fr)
+        if len(trip_divs) != 0:
+            msg_list = tripdivs_message(trip_divs)
+            embed_td.add_field(name='__{}__:'.format(tf_converter[time_frame]),value='')
+            for result in msg_list:
+                for header,body in result.items():
+                    embed_td.add_field(name=header,value=body)
+    await bot.say(embed=embed_td)
 
 @bot.command(pass_context=True)
 async def filter(ctx,i:str):
@@ -938,7 +930,6 @@ def coinsearch_message(coin,results_dict):
     Returns:
         cs_msg;str
     '''
-    periods = ['1 hour', '2 hour', '4 hour', '6 hour', '8 hour', '12 hour', '1 day']
     time_frames = ['1h','2h','4h','6h','8h','12h','1d']
     tf_converter = {'1h':'1 Hour:','2h':'2 Hour:','4h':'4 Hour:','6h':'6 Hour:','8h':'8 Hour:','12h':'12 Hour:','1d':'1 Day:'}
     msg_fr = ''
@@ -983,8 +974,8 @@ def coinsearch_message(coin,results_dict):
         trip_divs = find_tripdivs(full_results)
         coins_td = []
         for result in trip_divs:
-            for coin,info in result.items():
-                coins_td.append(coin)
+            for c,info in result.items():
+                coins_td.append(c)
         if coin in coins_td:
             msg_t = msg_t + '{}: :white_check_mark:\n'.format(time_frame)
         else:
