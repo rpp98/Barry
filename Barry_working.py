@@ -981,7 +981,10 @@ def coinsearch_message(coin,results_dict):
 
         #find occurrences in triple div
         trip_divs = find_tripdivs(full_results)
-        coins_td = [coin for coin,info in trip_divs.items()]
+        coins_td = []
+        for result in trip_div:
+            for coin,info in result.items():
+                coins_td.append(coin)
         if coin in coins_td:
             msg_t = msg_t + '{}: :white_check_mark:\n'.format(time_frame)
         else:
