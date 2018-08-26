@@ -982,7 +982,7 @@ def coinsearch_message(coin,results_dict):
         #find occurrences in triple div
         trip_divs = find_tripdivs(full_results)
         coins_td = []
-        for result in trip_div:
+        for result in trip_divs:
             for coin,info in result.items():
                 coins_td.append(coin)
         if coin in coins_td:
