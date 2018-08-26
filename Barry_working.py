@@ -192,31 +192,34 @@ async def recent(ctx):
                 if char_counter > 5000:
                     await bot.say(embed=embed)
                     await asyncio.sleep(0.05)
+                    embed = discord.Embed(title='Recent Divergences for All Time Frames (Page 2)', description='')
                     char_counter = 0
                 embed.add_field(name='__{}__'.format(header),value=msg)
     await bot.say(embed=embed)
     await asyncio.sleep(0.05)
     #Trip Divs
-    embed = discord.Embed(title='__Recent Triple Divergences__',value='')
     time_frames = ['1h','2h','4h','6h','8h','12h','1d']
     tf_converter = {'1h':'1 Hour', '2h':'2 Hour', '4h':'4 Hour', '6h':'6 Hour', '8h':'8 Hour', '12h':'12 Hour', '1d':'1 Day'}
+    td = {}
+    #Organize and sort results for triple divergences
     for time_frame in time_frames:
-        results = results_dict[time_frame][0]
-        filtered_results = recent_filter(results,2)
+        results = bot.results_dict[time_frame][0]
+        filtered_results = recent_filter(results, 2)
         trip_divs = find_tripdivs(filtered_results)
-        msg_list = tripdivs_message(trip_divs)
-        if len(msg_list) != 0:
-            #Create name for embed field
-            field_name = tf_converter[time_frame]
-            #Create value for embed field
-            field_value = ''
-            for result in msg_list:
-                for header,body in result.items():
-                    field_value = field_value + '__{}__:\n{}'.format(header,body)
-            print(len(field_name))
-            print(len(field_value),field_value)
-            embed.add_field(name=field_name,value=field_value)
-    await bot.say(embed=embed)
+        if trip_divs[0] != {'None':'None'}:
+            td[tf_converter[time_frame]] = trip_divs
+    #Make messages and embed
+    embed2 = discord.Embed(title='__Recent Triple Divergences__',value='')
+    if len(td) != 0:
+        for time_frame,result in td.items():
+            embed2.add_field(name='__{}__:'.format(time_frame),value='')
+            msg_list = tripdivs_message(result)
+            for trip_div in msg_list:
+                for header,body in trip_div.items():
+                    embed2.add_field(name=header,value=body)
+    else:
+        embed2.add_field(name='None',value='None')
+    await bot.say(embed=embed2)
 
 @bot.command(pass_context=True)
 async def filter(ctx,i:str):
