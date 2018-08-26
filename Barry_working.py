@@ -203,8 +203,7 @@ async def recent(ctx):
     td = {}
     #Organize and sort results for triple divergences
     for time_frame in time_frames:
-        results = bot.results_dict[time_frame][0]
-        filtered_results = recent_filter(results, 2)
+        filtered_results = recent_filter(results_dict, 2)
         trip_divs = find_tripdivs(filtered_results)
         if trip_divs[0] != {'None':'None'}:
             td[tf_converter[time_frame]] = trip_divs
