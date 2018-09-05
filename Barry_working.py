@@ -204,9 +204,9 @@ async def recent(ctx):
     tf_converter = {'1h':'1 Hour', '2h':'2 Hour', '4h':'4 Hour', '6h':'6 Hour', '8h':'8 Hour', '12h':'12 Hour', '1d':'1 Day'}
     for time_frame in time_frames:
         results_dict = bot.results_dict
-        rd = recent_filter(results_dict,2)
-        results_fr, results_cd = rd[time_frame]
-        results_sorted = sort_based_on_score(results_fr)
+        results_fr,results_cd = results_dict[time_frame]
+        results_recent = recent_filter(results_fr,2)
+        results_sorted = sort_based_on_score(results_recent)
         trip_divs = find_tripdivs(results_sorted)
         t_msg = tripdivs_message(trip_divs)
         if t_msg != {'None':'None'}:
