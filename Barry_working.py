@@ -205,7 +205,7 @@ async def recent(ctx):
     for time_frame in time_frames:
         results_dict = bot.results_dict
         results_fr,results_cd = results_dict[time_frame]
-        results_recent = recent_filter(results_fr,2)
+        results_recent = recent_filter_td(results_fr)
         results_sorted = sort_based_on_score(results_recent)
         trip_divs = find_tripdivs(results_sorted)
         t_msg = tripdivs_message(trip_divs)
@@ -993,7 +993,7 @@ def coinsearch_message(coin,results_dict):
 def recent_filter(full_results,i):
     '''
     Parameters:
-        full_results;dictionary of tuples of lists
+        full_results;list of dictionaries of tuples of lists of dictionaries
         i;int
     Returns:
         filtered_results;list of dictionaries
@@ -1010,6 +1010,9 @@ def recent_filter(full_results,i):
                 r['period'] = period
                 filtered_results.append(r)
     return filtered_results
+
+def recent_filter_td(results):
+    return [r for r in results if r['position'][1] == 2]
 
 def recent_message(results):
     '''Makes the message for $recent command for embed
@@ -1070,6 +1073,8 @@ def valid_when(i):
         return False
     else:
         return True
+
+#results_dict = [{'period':(results_fr,results_cd)}, ...]
 
 my_token = os.environ.get('TOKEN')
 bot.run(my_token)
