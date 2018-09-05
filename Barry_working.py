@@ -215,6 +215,7 @@ async def recent(ctx):
                 for header,body in result.items():
                     embed2.add_field(name=header,value=body)
                     field_counter += 1
+    print(field_counter)
     await bot.say(embed=embed2)
 
 @bot.command(pass_context=True)
