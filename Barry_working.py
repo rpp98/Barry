@@ -202,10 +202,10 @@ async def recent(ctx):
     #rewrite
     embed2 = discord.Embed(title='Recent Triple Divergences for all Time Frames',description='')
     tf_converter = {'1h':'1 Hour', '2h':'2 Hour', '4h':'4 Hour', '6h':'6 Hour', '8h':'8 Hour', '12h':'12 Hour', '1d':'1 Day'}
-    field_counter = 0
     for time_frame in time_frames:
         results_dict = bot.results_dict
-        results_fr, results_cd = results_dict[time_frame]
+        rd = recent_filter(results_dict,2)
+        results_fr, results_cd = rd[time_frame]
         results_sorted = sort_based_on_score(results_fr)
         trip_divs = find_tripdivs(results_sorted)
         t_msg = tripdivs_message(trip_divs)
@@ -214,8 +214,6 @@ async def recent(ctx):
             for result in t_msg:
                 for header,body in result.items():
                     embed2.add_field(name=header,value=body)
-                    field_counter += 1
-    print(field_counter)
     await bot.say(embed=embed2)
 
 @bot.command(pass_context=True)
