@@ -216,7 +216,8 @@ async def recent(ctx):
                 for header,body in result.items():
                     print(header,body)
                     field_counter += 1
-                    embed2.add_field(name=header,value=body)
+                    if header != 'None' or body != 'None':
+                        embed2.add_field(name=header,value=body)
     print(field_counter)
     await bot.say(embed=embed2)
 
@@ -267,9 +268,9 @@ async def get_candles(coin,limitK,period):
             if resp.status == 200:
                 coin_data = await resp.json()
     return [{
-        "open": d[1],
-        "close": d[4],
-        "volume": d[5],
+        "open": float(d[1]),
+        "close": float(d[4]),
+        "volume": float(d[5]),
     } for d in coin_data]
 
 def calculateRSI(coin_data):
@@ -1077,6 +1078,8 @@ def valid_when(i):
         return False
     else:
         return True
+
+
 
 #results_dict = [{'period':(results_fr,results_cd)}, ...]
 
