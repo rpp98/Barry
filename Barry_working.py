@@ -214,10 +214,11 @@ async def recent(ctx):
             embed2.add_field(name='__{}__:'.format(tf_converter[time_frame]),value='')
             for result in t_msg:
                 for header,body in result.items():
-                    print(header,body)
                     field_counter += 1
                     if header != 'None' or body != 'None':
+                        print(header,body)
                         embed2.add_field(name=header,value=body)
+                        await asyncio.sleep(0.05)
     print(field_counter)
     await bot.say(embed=embed2)
 
