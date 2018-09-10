@@ -211,7 +211,7 @@ async def recent(ctx):
         results_sorted = sort_based_on_score(results_recent)
         trip_divs = find_tripdivs(results_sorted)
         t_msg = tripdivs_message(trip_divs)
-        if t_msg != {'None':'None'}:
+        if t_msg != [{'None':'None'}]:
             field_name = tf_converter[time_frame]
             embed2.add_field(name='__{}__:'.format(field_name),value='')
             print(field_name)
