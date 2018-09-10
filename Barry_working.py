@@ -212,7 +212,10 @@ async def recent(ctx):
         trip_divs = find_tripdivs(results_sorted)
         t_msg = tripdivs_message(trip_divs)
         if t_msg != {'None':'None'}:
-            embed2.add_field(name='__{}__:'.format(tf_converter[time_frame]),value='')
+            field_name = tf_converter[time_frame]
+            embed2.add_field(name='__{}__:'.format(field_name),value='')
+            print(field_name)
+            print(t_msg)
             for result in t_msg:
                 for header,body in result.items():
                     field_counter += 1
@@ -221,9 +224,9 @@ async def recent(ctx):
                         char_counter.append(len(header) + len(body))
                         embed2.add_field(name=header,value=body)
                         await asyncio.sleep(0.05)
-    print(field_counter)
-    print(char_counter)
-    print(sum(char_counter))
+    print('TOTAL FIELDS',field_counter)
+    print('TOTAL CHAR',char_counter)
+    print('TOTAL CHARS TOTAL:',sum(char_counter))
     await bot.say(embed=embed2)
 
 @bot.command(pass_context=True)
