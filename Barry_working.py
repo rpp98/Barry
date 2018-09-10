@@ -217,10 +217,13 @@ async def recent(ctx):
             print(field_name)
             print(t_msg)
             for result in t_msg:
+                print('result',result)
                 for header,body in result.items():
                     field_counter += 1
+                    print('header',header)
+                    print('body',body)
                     if header != 'None' or body != 'None':
-                        print(header,body)
+                        print('tracker',header,body)
                         char_counter.append(len(header) + len(body))
                         embed2.add_field(name=header,value=body)
                         await asyncio.sleep(0.05)
