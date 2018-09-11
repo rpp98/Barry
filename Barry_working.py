@@ -213,7 +213,7 @@ async def recent(ctx):
         t_msg = tripdivs_message(trip_divs)
         if t_msg != [{'None':'None'}]:
             field_name = tf_converter[time_frame]
-            embed2.add_field(name='__{}__:'.format(field_name),value='')
+            embed.add_field(name='__{}__:'.format(field_name),value='')
             print(field_name)
             print(t_msg)
             for result in t_msg:
@@ -229,6 +229,8 @@ async def recent(ctx):
     print('TOTAL FIELDS',field_counter)
     print('TOTAL CHAR',char_counter)
     print('TOTAL CHARS TOTAL:',sum(char_counter))
+    if field_counter == 0:
+        embed.add_field(name='None',value='None')
     await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
