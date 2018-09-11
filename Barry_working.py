@@ -200,7 +200,7 @@ async def recent(ctx):
     #Trip Divs
     time_frames = ['1h','2h','4h','6h','8h','12h','1d']
     #rewrite
-    embed2 = discord.Embed(title='Recent Triple Divergences for all Time Frames',description='')
+    embed = discord.Embed(title='Recent Triple Divergences for all Time Frames',description='')
     tf_converter = {'1h':'1 Hour', '2h':'2 Hour', '4h':'4 Hour', '6h':'6 Hour', '8h':'8 Hour', '12h':'12 Hour', '1d':'1 Day'}
     field_counter = 0
     char_counter = []
@@ -225,12 +225,11 @@ async def recent(ctx):
                     if header != 'None' or body != 'None':
                         print('tracker',header,body)
                         char_counter.append(len(header) + len(body))
-                        embed2.add_field(name=header,value=body)
-                        await asyncio.sleep(0.05)
+                        embed.add_field(name=header,value=body)
     print('TOTAL FIELDS',field_counter)
     print('TOTAL CHAR',char_counter)
     print('TOTAL CHARS TOTAL:',sum(char_counter))
-    await bot.say(embed=embed2)
+    await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
 async def filter(ctx,i:str):
