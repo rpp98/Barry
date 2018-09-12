@@ -233,6 +233,7 @@ async def recent(ctx):
     print('TOTAL CHARS TOTAL:',sum(char_counter))
     if field_counter == 0:
         embed.add_field(name='None',value='None')
+    await asyncio.sleep(0.5)
     await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
