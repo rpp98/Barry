@@ -204,6 +204,7 @@ async def recent(ctx):
     tf_converter = {'1h':'1 Hour', '2h':'2 Hour', '4h':'4 Hour', '6h':'6 Hour', '8h':'8 Hour', '12h':'12 Hour', '1d':'1 Day'}
     field_counter = 0
     char_counter = []
+    fieldheader_counter = 0
     for time_frame in time_frames:
         results_dict = bot.results_dict
         results_fr,results_cd = results_dict[time_frame]
@@ -214,6 +215,7 @@ async def recent(ctx):
         if t_msg != [{'None':'None'}]:
             field_name = tf_converter[time_frame]
             embed.add_field(name='__{}__:'.format(field_name),value='')
+            fieldheader_counter += 1
             print(field_name)
             print(t_msg)
             for result in t_msg:
@@ -226,7 +228,7 @@ async def recent(ctx):
                         print('tracker',header,body)
                         char_counter.append(len(header) + len(body))
                         embed.add_field(name=header,value=body)
-    print('TOTAL FIELDS',field_counter)
+    print('TOTAL FIELDS',field_counter,fieldheader_counter)
     print('TOTAL CHAR',char_counter)
     print('TOTAL CHARS TOTAL:',sum(char_counter))
     if field_counter == 0:
