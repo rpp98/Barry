@@ -529,7 +529,7 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_mac
         ll_price.append(ll_price_broad[-1])
         ll_idx.append(ll_idx_broad[-1])
     """
-    ll_price, ll_idx = ll_algorithm_v2(prices)
+    ll_price, ll_idx = ll_comparator_v2(prices)
 
     #Find local lows for RSI and OBV according to the local low indices (ll_idx) for comparison against Price
     #Initialize lists
