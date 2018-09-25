@@ -493,6 +493,7 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_mac
         rsi_div_idx;list
         obv_div_idx;list
     """
+    """
     #Intitialize lists 
     ll_price_broad = []
     ll_idx = []
@@ -527,6 +528,9 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_mac
     if ll_price_broad[-1] < ll_price_broad[-2]:
         ll_price.append(ll_price_broad[-1])
         ll_idx.append(ll_idx_broad[-1])
+    """
+    ll_price, ll_idx = ll_algorithm_v2(prices)
+
     #Find local lows for RSI and OBV according to the local low indices (ll_idx) for comparison against Price
     #Initialize lists
     ll_RSI = []
@@ -759,7 +763,8 @@ def analysis_RSIOBVMACD(coin,coin_data,full_results,current_div_results):
         full_results;list of dictionaries
         current_div_results;list of dictionaries
     '''
-    list_price = price_per_period(coin_data)
+    #list_price = price_per_period(coin_data)
+    list_price = prices_v2(coin_data)
         #Runs full analysis if downtrend in price is detected
     if pre_comparator(list_price) == False:
         #Calculates RSI and OBV and MACD
@@ -1094,7 +1099,42 @@ def valid_when(i):
     else:
         return True
 
+def prices_v2(data):
+    prices = []
+    for d in data:
+        c = float(d['close'])
+        o = float(d['open'])
+        if c < o:
+            prices.append(c)
+        elif o < c:
+            prices.append(o)
+        else:
+            prices.append(c)
+    return prices[-28:]
 
+def ll_comparator_v2(prices):
+    '''
+    *Possibly run the comparator for more days than 28 then shorter after results are gathered?
+    (subtract 52 from indexes? after shorten?)
+    '''
+    lows = []
+    lows_idx = []
+    for i in range(1,len(prices) - 1):
+        if prices[i] <= prices[i - 1] and prices[i] <= prices[i + 1]:
+            lows.append(prices[i])
+            lows_idx.append(i)
+            
+    lows2 = []
+    lows2_idx = []
+    for i in range(1,len(lows)-1):
+        if lows[i] < lows[i - 1]:
+            lows2.append(lows[i])
+            lows2_idx.append(lows_idx[i])
+    if lows[-1] < lows[2]:
+        lows2.append(lows[-1])
+        lows2_idx.append(lows_idx[-1])
+
+    return lows2, lows2_idx
 
 #results_dict = [{'period':(results_fr,results_cd)}, ...]
 
