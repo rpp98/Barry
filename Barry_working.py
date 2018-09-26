@@ -1134,7 +1134,14 @@ def ll_comparator_v2(prices):
         lows2.append(lows[-1])
         lows2_idx.append(lows_idx[-1])
 
-    return lows2, lows2_idx
+    #Handle 
+    lows3 = [lows2[0]]
+    lows3_idx = [lows2_idx[0]]
+    for i in range(1, len(lows2)):
+        if (lows2[i] < lows2[i - 1]):
+            lows3.append(lows2[i])
+            lows3_idx.append(lows2_idx[i])
+    return lows3, lows3_idx
 
 #results_dict = [{'period':(results_fr,results_cd)}, ...]
 
