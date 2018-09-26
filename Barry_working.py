@@ -68,7 +68,7 @@ async def histdiv(ctx,time_frame:str):
         tf_converter_print = {'1hour':'1 hour','2hour':'2 hour','4hour':'4 hour','6hour':'6 hour','8hour':'8 hour','12hour':'12 hour','1day':'1 day'}
         #Print embed statements to Discord
         for idx in range(len(full_results_str_list)):
-            embed_title = 'Historical Divergences within 28 periods for {} Candles: Part {} of {}'.format(tf_converter_print[time_frame],idx + 1,len(full_results_str_list))
+            embed_title = 'Historical Divergences within 42 periods for {} Candles: Part {} of {}'.format(tf_converter_print[time_frame],idx + 1,len(full_results_str_list))
             message = full_results_str_list[idx][0]
             embed = discord.Embed(title=embed_title,description=message)
             await bot.say(embed=embed)
@@ -126,9 +126,9 @@ async def tripdiv(ctx,time_frame:str):
 async def helpme(ctx):
     embed = discord.Embed(title='Help Guide',description='*A quick overview of the bot*')
     embed.set_author(name='Triple Divergence Indicator (RSI/OBV/MACD)')
-    embed.add_field(name='Commands:',value='$helpme \n$histdiv (time frame) \n$currentdiv (time frame) \n$tripdiv (time frame) \n$howmany \n$coinsearch (COINPAIRING) \n$recent \n$filter (1-28)')
+    embed.add_field(name='Commands:',value='$helpme \n$histdiv (time frame) \n$currentdiv (time frame) \n$tripdiv (time frame) \n$howmany \n$coinsearch (COINPAIRING) \n$recent \n$filter (1-42)')
     embed.add_field(name='Valid Time Frames (written how is):',value='1hour, 2hour, 4hour, 6hour, 8hour, 12hour, 1day')
-    embed.add_field(name='Calculates/Finds?',value='RSI, OBV, and MACD Divergences (within 28 periods) and possible forming RSI Divergences')
+    embed.add_field(name='Calculates/Finds?',value='RSI, OBV, and MACD Divergences (within 42 periods) and possible forming RSI Divergences')
     embed.add_field(name='Feedback, Changes, or Input?',value='Add me on Discord: rpp#9779')
     await bot.say(embed=embed)
 
@@ -239,7 +239,7 @@ async def recent(ctx):
 @bot.command(pass_context=True)
 async def filter(ctx,i:str):
     if valid_when(i) == False:
-        await bot.say('Invalid input for $filter command. Second input for command must be a whole number between 2 and 28')
+        await bot.say('Invalid input for $filter command. Second input for command must be a whole number between 2 and 42')
     else:
         results_dict = bot.results_dict
         i = int(i)
@@ -344,8 +344,8 @@ def calculateRSI(coin_data):
         rsi = (100 - (100 / (1 + rs)))
         rsi = round(rsi,2)
         list_RSI.append(rsi)
-    #reduce list_RSI to last 28 rsi's for analysis
-    list_RSI = list_RSI[-28:]
+    #reduce list_RSI to last 42 rsi's for analysis
+    list_RSI = list_RSI[-42:]
     return list_RSI,last_avg_gain,last_avg_loss
 
 def calculate_obv(coin_data):
@@ -386,8 +386,8 @@ def calculate_obv(coin_data):
             del list_OBV[0]
         if list_OBV[0] != 0:
             zero_check = False
-    #Reduce list_OBV to last 28 OBVs for later analysis
-    list_OBV = list_OBV[-28:]
+    #Reduce list_OBV to last 42 OBVs for later analysis
+    list_OBV = list_OBV[-42:]
     return list_OBV
 
 def calculate_macd(coin_data):
@@ -446,9 +446,9 @@ def calculate_macd(coin_data):
             new_ema = (list_macd[idx] - prev_ema) * sconstant_9 + prev_ema
             list_sigline.append(new_ema)
             prev_ema = new_ema
-    #Reduce list_macd and list_sigline to 28 data points for further analysis
-    list_macd = list_macd[-28:]
-    list_sigline = list_sigline[-28:]
+    #Reduce list_macd and list_sigline to 42 data points for further analysis
+    list_macd = list_macd[-42:]
+    list_sigline = list_sigline[-42:]
     #Return statements
     return list_macd, list_sigline
 
@@ -466,8 +466,8 @@ def price_per_period(coin_data):
     for idx in range(len(coin_data)):
         price = float(coin_data[idx]['close'])
         list_price.append(price)
-    #Reduce list_price to the last 28 closing prices for later analysis
-    list_price = list_price[-28:]
+    #Reduce list_price to the last 42 closing prices for later analysis
+    list_price = list_price[-42:]
     return list_price
 
 def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_macd,list_sigline):
@@ -616,8 +616,8 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_mac
             score_RSI_price = ((abs(ll_price[idx - 1] - ll_price[idx]) / (ll_price[idx - 1])) * 100) + 1
             score_RSI.append(round(score_RSI_RSI * score_RSI_price,2))
             #Record position of divergence 
-            rsi_div_idx.append(28 - ll_idx[idx - 1])
-            rsi_div_idx.append(28 - ll_idx[idx])
+            rsi_div_idx.append(42 - ll_idx[idx - 1])
+            rsi_div_idx.append(42 - ll_idx[idx])
     
     #Determine trend_RSI based on number of divergences (at least 1)
     if counter_trend_RSI >= threshold:
@@ -636,8 +636,8 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_mac
             score_OBV_price = ((abs(ll_price[idx - 1] - ll_price[idx]) / (ll_price[idx - 1])) * 100) + 1
             score_OBV.append(abs(round(score_OBV_OBV * score_OBV_price,2)))
             #Record position of divergence
-            obv_div_idx.append(28 - ll_idx[idx - 1])
-            obv_div_idx.append(28 - ll_idx[idx])
+            obv_div_idx.append(42 - ll_idx[idx - 1])
+            obv_div_idx.append(42 - ll_idx[idx])
     #Determine trend_OBV based on number of divergences (at least 1)
     if counter_trend_OBV >= threshold:
         trend_OBV = True
@@ -655,8 +655,8 @@ def comparator(list_price,list_RSI,list_OBV,last_avg_gain,last_avg_loss,list_mac
             score_MACD_price = ((abs(ll_price[idx - 1] - ll_price[idx]) / (ll_price[idx - 1])) * 100) + 1
             score_MACD.append(abs(round(score_MACD_MACD * score_MACD_price,2)))
             #Record position of divergence
-            macd_div_idx.append(28 - ll_idx[idx - 1])
-            macd_div_idx.append(28 - ll_idx[idx])
+            macd_div_idx.append(42 - ll_idx[idx - 1])
+            macd_div_idx.append(42 - ll_idx[idx])
     #Deterine trend_MACD based on number of divergences (at least 1)
     if counter_trend_MACD >= threshold:
         trend_MACD = True
@@ -1094,7 +1094,7 @@ def valid_when(i):
         int(i)
     except ValueError:
         return False
-    if int(i) >= 28 or int(i) <= 1:
+    if int(i) >= 42 or int(i) <= 1:
         return False
     else:
         return True
@@ -1110,11 +1110,11 @@ def prices_v2(data):
             prices.append(o)
         else:
             prices.append(c)
-    return prices[-28:]
+    return prices[-42:]
 
 def ll_comparator_v2(prices):
     '''
-    *Possibly run the comparator for more days than 28 then shorter after results are gathered?
+    *Possibly run the comparator for more days than 42 then shorter after results are gathered?
     (subtract 52 from indexes? after shorten?)
     '''
     lows = []
